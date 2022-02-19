@@ -31,3 +31,27 @@ class TestScoreMeld:
             Card(Rank.KING, Suit.DIAMONDS),
         ]
         assert score_meld(hand=hand, trump=Suit.SPADES) == 2
+
+    def test_one_and_a_half_marriages(self):
+        hand = [
+            Card(Rank.QUEEN, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.DIAMONDS),
+        ]
+        assert score_meld(hand=hand, trump=Suit.SPADES) == 2
+
+    def test_two_marriages_in_different_suits(self):
+        hand = [
+            Card(Rank.QUEEN, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.DIAMONDS),
+            Card(Rank.QUEEN, Suit.HEARTS),
+            Card(Rank.KING, Suit.HEARTS),
+        ]
+        assert score_meld(hand=hand, trump=Suit.SPADES) == 4
+
+    def test_two_marriages_in_same_suit(self):
+        hand = [
+            Card(Rank.QUEEN, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.DIAMONDS),
+        ] * 2
+        assert score_meld(hand=hand, trump=Suit.SPADES) == 4
