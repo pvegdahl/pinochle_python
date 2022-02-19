@@ -62,3 +62,14 @@ class TestScoreMeld:
             Card(Rank.KING, Suit.DIAMONDS),
         ]
         assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 4
+
+    def test_two_marriage_of_trump_and_one_other(self):
+        hand = [
+            Card(Rank.QUEEN, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.DIAMONDS),
+            Card(Rank.QUEEN, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.DIAMONDS),
+            Card(Rank.QUEEN, Suit.CLUBS),
+            Card(Rank.KING, Suit.CLUBS),
+        ]
+        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 10
