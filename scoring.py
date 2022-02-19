@@ -52,8 +52,8 @@ class MeldCounter:
             nines_of_trump=self._nines_of_trump(),
             non_trump_marriages=self._non_trump_marriages(),
             trump_marriages=self._trump_marriages(),
-            kings_around=self._kings_around(),
-            aces_around=self._aces_around(),
+            kings_around=self._count_around(Rank.KING),
+            aces_around=self._count_around(Rank.ACE),
         )
 
     def _nines_of_trump(self) -> int:
@@ -86,20 +86,11 @@ class MeldCounter:
     def _trump_marriages(self) -> int:
         return self._marriages_in_suit(self.trump)
 
-    def _kings_around(self) -> int:
-        kings = [card for card in self.hand if card.rank == Rank.KING]
-        if len(kings) == 8:
+    def _count_around(self, rank: Rank) -> int:
+        matching_cards = [card for card in self.hand if card.rank == rank]
+        if len(matching_cards) == 8:
             return 2
-        suits = set(card.suit for card in kings)
-        if len(suits) == 4:
-            return 1
-        return 0
-
-    def _aces_around(self) -> int:
-        aces = [card for card in self.hand if card.rank == Rank.ACE]
-        if len(aces) == 8:
-            return 2
-        suits = set(card.suit for card in aces)
+        suits = set(card.suit for card in matching_cards)
         if len(suits) == 4:
             return 1
         return 0
