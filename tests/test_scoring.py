@@ -73,3 +73,29 @@ class TestScoreMeld:
             Card(Rank.KING, Suit.CLUBS),
         ]
         assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 10
+
+    def test_aces_around(self):
+        hand = [
+            Card(Rank.ACE, Suit.CLUBS),
+            Card(Rank.ACE, Suit.DIAMONDS),
+            Card(Rank.ACE, Suit.HEARTS),
+            Card(Rank.ACE, Suit.SPADES),
+        ]
+        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 10
+
+    def test_four_aces_but_not_around(self):
+        hand = [
+            Card(Rank.ACE, Suit.DIAMONDS),
+            Card(Rank.ACE, Suit.DIAMONDS),
+            Card(Rank.ACE, Suit.HEARTS),
+            Card(Rank.ACE, Suit.SPADES),
+        ]
+        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 0
+
+    def test_lots_of_aces_but_not_around(self):
+        hand = [
+            Card(Rank.ACE, Suit.DIAMONDS),
+            Card(Rank.ACE, Suit.HEARTS),
+            Card(Rank.ACE, Suit.SPADES),
+        ] * 2
+        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 0
