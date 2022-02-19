@@ -9,13 +9,27 @@ class Meld(NamedTuple):
     trump_marriages: int = 0
     aces_around: int = 0
 
+    def score(self) -> int:
+        return (
+            self.nines_of_trump
+            + self.non_trump_marriages * 2
+            + self.trump_marriages * 4
+            + self._score_aces_around()
+        )
+
+    def _score_aces_around(self):
+        match self.aces_around:
+            case 0:
+                return 0
+            case 1:
+                return 10
+            case 2:
+                return 100
+
 
 def score_meld(hand: List[Card], trump: Suit) -> int:
     meld = MeldCounter(hand=hand, trump=trump).count()
-    score = (
-        meld.nines_of_trump + meld.non_trump_marriages * 2 + meld.trump_marriages * 4 + meld.aces_around * 10
-    )
-    return score
+    return meld.score()
 
 
 class MeldCounter:
@@ -63,6 +77,8 @@ class MeldCounter:
 
     def _aces_around(self) -> int:
         aces = [card for card in self.hand if card.rank == Rank.ACE]
+        if len(aces) == 8:
+            return 2
         suits = set(card.suit for card in aces)
         if len(suits) == 4:
             return 1
