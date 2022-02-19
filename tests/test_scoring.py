@@ -18,3 +18,10 @@ class TestScoreMeld:
         ] * 2
         assert score_meld(hand=hand, trump=Suit.SPADES) == 0
 
+    def test_nine_of_trump(self):
+        assert score_meld(hand=[Card(Rank.NINE, Suit.HEARTS)], trump=Suit.HEARTS) == 1
+
+    def test_2x_nine_of_trump(self):
+        assert (
+            score_meld(hand=[Card(Rank.NINE, Suit.HEARTS)] * 2, trump=Suit.HEARTS) == 2
+        )
