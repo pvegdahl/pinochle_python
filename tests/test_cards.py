@@ -70,9 +70,9 @@ def test_each_card_exists_exactly_twice(card):
 @pytest.mark.parametrize(
     "lower_card, higher_card",
     [
-        (Card(Suit.CLUBS, Rank.NINE), Card(Suit.CLUBS, Rank.JACK)),
-        (Card(Suit.CLUBS, Rank.KING), Card(Suit.HEARTS, Rank.KING)),
-        (Card(Suit.CLUBS, Rank.ACE), Card(Suit.HEARTS, Rank.KING)),
+        (Card(Rank.NINE, Suit.CLUBS), Card(Rank.JACK, Suit.CLUBS)),
+        (Card(Rank.KING, Suit.CLUBS), Card(Rank.KING, Suit.HEARTS)),
+        (Card(Rank.ACE, Suit.CLUBS), Card(Rank.KING, Suit.HEARTS)),
     ],
 )
 def test_card_ordering(lower_card, higher_card):

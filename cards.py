@@ -36,8 +36,8 @@ class Rank(Enum):
 @functools.total_ordering
 @dataclass(frozen=True)
 class Card:
-    suit: Suit
     rank: Rank
+    suit: Suit
 
     def __lt__(self, other):
         if self.suit == other.suit:
