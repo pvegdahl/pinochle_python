@@ -40,8 +40,12 @@ def test_eight_of_each_rank_in_deck(rank):
     assert len(cards_of_rank) == 8
 
 
-@pytest.mark.parametrize("card", [pytest.param(card, id=f"{card.rank.name} of {card.suit.name}") for card in set(CardDeck().cards)])
+@pytest.mark.parametrize(
+    "card",
+    [
+        pytest.param(card, id=f"{card.rank.name} of {card.suit.name}")
+        for card in set(CardDeck().cards)
+    ],
+)
 def test_each_card_exists_exactly_twice(card):
     assert len([c for c in CardDeck().cards if c == card]) == 2
-
-
