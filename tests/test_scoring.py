@@ -11,11 +11,10 @@ class TestScoreMeld:
             Card(Rank.NINE, Suit.CLUBS),
             Card(Rank.NINE, Suit.DIAMONDS),
             Card(Rank.NINE, Suit.HEARTS),
-        ] * 2 + [
             Card(Rank.JACK, Suit.SPADES),
             Card(Rank.QUEEN, Suit.DIAMONDS),
             Card(Rank.KING, Suit.HEARTS),
-        ] * 2
+        ]
         assert score_meld(hand=hand, trump=Suit.SPADES) == 0
 
     def test_nine_of_trump(self):
@@ -25,3 +24,10 @@ class TestScoreMeld:
         assert (
             score_meld(hand=[Card(Rank.NINE, Suit.HEARTS)] * 2, trump=Suit.HEARTS) == 2
         )
+
+    def test_one_marriage(self):
+        hand = [
+            Card(Rank.QUEEN, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.DIAMONDS),
+        ]
+        assert score_meld(hand=hand, trump=Suit.SPADES) == 2
