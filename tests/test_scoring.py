@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 import pytest
 
@@ -112,3 +112,16 @@ class TestScoreMeld:
     def test_double_rank_around(self, rank_and_value):
         hand = [Card(rank_and_value.rank, suit) for suit in Suit] * 2
         assert score_meld(hand=hand, trump=Suit.DIAMONDS) == rank_and_value.value * 10
+
+    def test_run_in_trump(self):
+        assert score_meld(hand=self._create_run(Suit.HEARTS), trump=Suit.HEARTS) == 15
+
+    @staticmethod
+    def _create_run(suit: Suit) -> List[Card]:
+        return [
+            Card(Rank.ACE, suit),
+            Card(Rank.TEN, suit),
+            Card(Rank.KING, suit),
+            Card(Rank.QUEEN, suit),
+            Card(Rank.JACK, suit),
+        ]

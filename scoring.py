@@ -11,6 +11,7 @@ class Meld(NamedTuple):
     queens_around: int = 0
     kings_around: int = 0
     aces_around: int = 0
+    runs_in_trump: int = 0
 
     def score(self) -> int:
         return (
@@ -20,6 +21,7 @@ class Meld(NamedTuple):
             + self._score_queens_around()
             + self._score_kings_around()
             + self._score_aces_around()
+            + self._score_runs_in_trump()
         )
 
     def _score_marriages(self) -> int:
@@ -28,13 +30,8 @@ class Meld(NamedTuple):
     def _score_jacks_around(self):
         return self._score_around(self.jacks_around, 4)
 
-    def _score_queens_around(self):
-        return self._score_around(self.queens_around, 6)
-
-    def _score_kings_around(self):
-        return self._score_around(self.kings_around, 8)
-
-    def _score_around(self, count, base_score):
+    @staticmethod
+    def _score_around(count, base_score):
         match count:
             case 0:
                 return 0
@@ -43,8 +40,17 @@ class Meld(NamedTuple):
             case 2:
                 return base_score * 10
 
+    def _score_queens_around(self):
+        return self._score_around(self.queens_around, 6)
+
+    def _score_kings_around(self):
+        return self._score_around(self.kings_around, 8)
+
     def _score_aces_around(self):
         return self._score_around(self.aces_around, 10)
+
+    def _score_runs_in_trump(self):
+        return self.runs_in_trump * 15
 
 
 def score_meld(hand: List[Card], trump: Suit) -> int:
@@ -66,6 +72,7 @@ class MeldCounter:
             queens_around=self._count_around(Rank.QUEEN),
             kings_around=self._count_around(Rank.KING),
             aces_around=self._count_around(Rank.ACE),
+            runs_in_trump=self._runs_in_trump()
         )
 
     def _nines_of_trump(self) -> int:
@@ -96,7 +103,7 @@ class MeldCounter:
         return 0
 
     def _trump_marriages(self) -> int:
-        return self._marriages_in_suit(self.trump)
+        return self._marriages_in_suit(self.trump) - self._runs_in_trump()
 
     def _count_around(self, rank: Rank) -> int:
         matching_cards = [card for card in self.hand if card.rank == rank]
@@ -106,3 +113,10 @@ class MeldCounter:
         if len(suits) == 4:
             return 1
         return 0
+
+    def _runs_in_trump(self) -> int:
+        ranks = [card.rank for card in self.hand if card.rank != Rank.NINE]
+        if len(ranks) == 5:
+            return 1
+        return 0
+
