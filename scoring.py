@@ -22,22 +22,19 @@ class Meld(NamedTuple):
         return self.non_trump_marriages * 2 + self.trump_marriages * 4
 
     def _score_kings_around(self):
-        match self.kings_around:
+        return self._score_around(self.kings_around, 8)
+
+    def _score_around(self, count, base_score):
+        match count:
             case 0:
                 return 0
             case 1:
-                return 8
+                return base_score
             case 2:
-                return 80
+                return base_score * 10
 
     def _score_aces_around(self):
-        match self.aces_around:
-            case 0:
-                return 0
-            case 1:
-                return 10
-            case 2:
-                return 100
+        return self._score_around(self.aces_around, 10)
 
 
 def score_meld(hand: List[Card], trump: Suit) -> int:
