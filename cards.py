@@ -2,7 +2,7 @@ import functools
 import random
 from dataclasses import dataclass
 from enum import Enum, unique, auto, IntEnum
-from typing import List
+from typing import List, Tuple
 
 
 @functools.total_ordering
@@ -51,5 +51,8 @@ class CardDeck:
     def __init__(self):
         self.cards = [Card(suit=suit, rank=rank) for suit in Suit for rank in Rank] * 2
 
-    def shuffle(self):
+    def shuffle(self) -> None:
         random.shuffle(self.cards)
+
+    def deal(self) -> Tuple[List[Card], ...]:
+        return self.cards[:12], self.cards[12:24], self.cards[24:36], self.cards[36:]

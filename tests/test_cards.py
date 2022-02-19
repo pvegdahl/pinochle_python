@@ -89,7 +89,7 @@ class TestCardDeckShuffle:
     def test_all_cards_still_exist(self):
         deck = CardDeck()
         deck.shuffle()
-        assert sorted(deck.cards) == sorted(CardDeck().cards)
+        _validate_all_cards_present(deck.cards)
 
     def test_shuffling_wont_repeat_anytime_in_1000_iterations(self):
         original_card_order = CardDeck().cards
@@ -97,3 +97,23 @@ class TestCardDeckShuffle:
         for _ in range(1000):
             deck.shuffle()
             assert deck.cards != original_card_order
+
+
+def _validate_all_cards_present(cards):
+    assert sorted(cards) == sorted(CardDeck().cards)
+
+
+class TestCardDeckDeal:
+    def test_four_hands(self):
+        assert len(CardDeck().deal()) == 4
+
+    def test_twelve_cards_per_hand(self):
+        for hand in CardDeck().deal():
+            assert len(hand) == 12
+
+    def test_combine_hands_equals_deck(self):
+        hands = CardDeck().deal()
+        all_cards = []
+        for hand in hands:
+            all_cards.extend(hand)
+        _validate_all_cards_present(all_cards)
