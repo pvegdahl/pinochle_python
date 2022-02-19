@@ -25,7 +25,23 @@ from cards import Rank, CardDeck, Suit
 )
 def test_rank_ordering(lower, higher):
     assert lower < higher
-    assert not lower > higher
+    assert not lower >= higher
+
+
+@pytest.mark.parametrize(
+    "lower, higher",
+    [
+        (Suit.CLUBS, Suit.DIAMONDS),
+        (Suit.CLUBS, Suit.HEARTS),
+        (Suit.CLUBS, Suit.SPADES),
+        (Suit.DIAMONDS, Suit.HEARTS),
+        (Suit.DIAMONDS, Suit.SPADES),
+        (Suit.HEARTS, Suit.SPADES),
+    ],
+)
+def test_suit_ordering(lower, higher):
+    assert lower < higher
+    assert not lower >= higher
 
 
 @pytest.mark.parametrize("suit", [pytest.param(suit, id=suit.name) for suit in Suit])
@@ -34,7 +50,7 @@ def test_twelve_of_each_suit_in_deck(suit):
     assert len(cards_of_suit) == 12
 
 
-@pytest.mark.parametrize("rank", [pytest.param(rank) for rank in Rank])
+@pytest.mark.parametrize("rank", [pytest.param(rank, id=rank.name) for rank in Rank])
 def test_eight_of_each_rank_in_deck(rank):
     cards_of_rank = [card for card in CardDeck().cards if card.rank == rank]
     assert len(cards_of_rank) == 8

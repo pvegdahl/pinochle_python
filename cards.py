@@ -1,8 +1,10 @@
+import functools
 from dataclasses import dataclass
 from enum import Enum, unique, auto, IntEnum
 from typing import List
 
 
+@functools.total_ordering
 @unique
 class Suit(Enum):
     CLUBS = "Clubs"
@@ -10,15 +12,24 @@ class Suit(Enum):
     HEARTS = "Hearts"
     SPADES = "Spades"
 
+    def __lt__(self, other):
+        order = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES]
+        return order.index(self) < order.index(other)
 
+
+@functools.total_ordering
 @unique
-class Rank(IntEnum):
-    NINE = auto()
-    JACK = auto()
-    QUEEN = auto()
-    KING = auto()
-    TEN = auto()
-    ACE = auto()
+class Rank(Enum):
+    NINE = "Nine"
+    JACK = "Jack"
+    QUEEN = "Queen"
+    KING = "King"
+    TEN = "Ten"
+    ACE = "Ace"
+
+    def __lt__(self, other):
+        order = [Rank.NINE, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.TEN, Rank.ACE]
+        return order.index(self) < order.index(other)
 
 
 @dataclass(frozen=True)
