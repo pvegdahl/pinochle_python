@@ -98,3 +98,7 @@ class TestScoreMeld:
     def test_double_aces_around(self):
         hand = [Card(Rank.ACE, suit) for suit in Suit] * 2
         assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 100
+
+    def test_kings_around(self):
+        hand = [Card(Rank.KING, suit) for suit in Suit]
+        assert score_meld(hand=hand, trump=Suit.CLUBS) == 8
