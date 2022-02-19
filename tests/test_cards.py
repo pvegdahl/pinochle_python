@@ -86,7 +86,14 @@ class TestCardDeckShuffle:
         deck.shuffle()
         assert deck.cards != CardDeck().cards
 
-    # def test_all_cards_still_exist(self):
-    #     deck = CardDeck()
-    #     deck.shuffle()
-    #     sorted(deck.cards) == sorted(CardDeck().cards)
+    def test_all_cards_still_exist(self):
+        deck = CardDeck()
+        deck.shuffle()
+        assert sorted(deck.cards) == sorted(CardDeck().cards)
+
+    def test_shuffling_wont_repeat_anytime_in_1000_iterations(self):
+        original_card_order = CardDeck().cards
+        deck = CardDeck()
+        for _ in range(1000):
+            deck.shuffle()
+            assert deck.cards != original_card_order

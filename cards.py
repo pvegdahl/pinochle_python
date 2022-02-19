@@ -1,4 +1,5 @@
 import functools
+import random
 from dataclasses import dataclass
 from enum import Enum, unique, auto, IntEnum
 from typing import List
@@ -51,4 +52,4 @@ class CardDeck:
         self.cards = [Card(suit=suit, rank=rank) for suit in Suit for rank in Rank] * 2
 
     def shuffle(self):
-        self.cards.pop()
+        random.shuffle(self.cards)
