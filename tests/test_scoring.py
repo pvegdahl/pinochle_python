@@ -1,3 +1,7 @@
+from typing import NamedTuple
+
+import pytest
+
 from cards import Suit, Card, Rank
 from scoring import score_meld
 
@@ -74,31 +78,37 @@ class TestScoreMeld:
         ]
         assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 10
 
-    def test_aces_around(self):
-        hand = [Card(Rank.ACE, suit) for suit in Suit]
-        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 10
+    class RankAndValue(NamedTuple):
+        rank: Rank
+        value: int
 
-    def test_four_aces_but_not_around(self):
+    @pytest.fixture(
+        scope="module", params=[RankAndValue(Rank.KING, 8), RankAndValue(Rank.ACE, 10)]
+    )
+    def rank_and_value(self, request):
+        return request.param
+
+    def test_rank_around(self, rank_and_value):
+        hand = [Card(rank_and_value.rank, suit) for suit in Suit]
+        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == rank_and_value.value
+
+    def test_four_of_rank_but_not_around(self, rank_and_value):
         hand = [
-            Card(Rank.ACE, Suit.DIAMONDS),
-            Card(Rank.ACE, Suit.DIAMONDS),
-            Card(Rank.ACE, Suit.HEARTS),
-            Card(Rank.ACE, Suit.SPADES),
+            Card(rank_and_value.rank, Suit.DIAMONDS),
+            Card(rank_and_value.rank, Suit.DIAMONDS),
+            Card(rank_and_value.rank, Suit.HEARTS),
+            Card(rank_and_value.rank, Suit.SPADES),
         ]
         assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 0
 
-    def test_lots_of_aces_but_not_around(self):
+    def test_lots_of_one_rank_but_not_around(self, rank_and_value):
         hand = [
-            Card(Rank.ACE, Suit.DIAMONDS),
-            Card(Rank.ACE, Suit.HEARTS),
-            Card(Rank.ACE, Suit.SPADES),
+            Card(rank_and_value.rank, Suit.DIAMONDS),
+            Card(rank_and_value.rank, Suit.HEARTS),
+            Card(rank_and_value.rank, Suit.SPADES),
         ] * 2
         assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 0
 
-    def test_double_aces_around(self):
-        hand = [Card(Rank.ACE, suit) for suit in Suit] * 2
-        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == 100
-
-    def test_kings_around(self):
-        hand = [Card(Rank.KING, suit) for suit in Suit]
-        assert score_meld(hand=hand, trump=Suit.CLUBS) == 8
+    def test_double_rank_around(self, rank_and_value):
+        hand = [Card(rank_and_value.rank, suit) for suit in Suit] * 2
+        assert score_meld(hand=hand, trump=Suit.DIAMONDS) == rank_and_value.value * 10
