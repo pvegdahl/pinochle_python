@@ -12,10 +12,12 @@ class Meld(NamedTuple):
     def score(self) -> int:
         return (
             self.nines_of_trump
-            + self.non_trump_marriages * 2
-            + self.trump_marriages * 4
+            + self._score_marriages()
             + self._score_aces_around()
         )
+
+    def _score_marriages(self) -> int:
+        return self.non_trump_marriages * 2 + self.trump_marriages * 4
 
     def _score_aces_around(self):
         match self.aces_around:
