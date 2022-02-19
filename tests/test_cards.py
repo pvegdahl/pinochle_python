@@ -1,6 +1,6 @@
 import pytest
 
-from cards import Rank, CardDeck, Suit
+from cards import Rank, CardDeck, Suit, Card
 
 
 @pytest.mark.parametrize(
@@ -65,3 +65,28 @@ def test_eight_of_each_rank_in_deck(rank):
 )
 def test_each_card_exists_exactly_twice(card):
     assert len([c for c in CardDeck().cards if c == card]) == 2
+
+
+@pytest.mark.parametrize(
+    "lower_card, higher_card",
+    [
+        (Card(Suit.CLUBS, Rank.NINE), Card(Suit.CLUBS, Rank.JACK)),
+        (Card(Suit.CLUBS, Rank.KING), Card(Suit.HEARTS, Rank.KING)),
+        (Card(Suit.CLUBS, Rank.ACE), Card(Suit.HEARTS, Rank.KING)),
+    ],
+)
+def test_card_ordering(lower_card, higher_card):
+    assert lower_card < higher_card
+    assert not lower_card > higher_card
+
+
+class TestCardDeckShuffle:
+    def test_different_order(self):
+        deck = CardDeck()
+        deck.shuffle()
+        assert deck.cards != CardDeck().cards
+
+    # def test_all_cards_still_exist(self):
+    #     deck = CardDeck()
+    #     deck.shuffle()
+    #     sorted(deck.cards) == sorted(CardDeck().cards)

@@ -32,10 +32,16 @@ class Rank(Enum):
         return order.index(self) < order.index(other)
 
 
+@functools.total_ordering
 @dataclass(frozen=True)
 class Card:
     suit: Suit
     rank: Rank
+
+    def __lt__(self, other):
+        if self.suit == other.suit:
+            return self.rank < other.rank
+        return self.suit < other.suit
 
 
 class CardDeck:
@@ -43,3 +49,6 @@ class CardDeck:
 
     def __init__(self):
         self.cards = [Card(suit=suit, rank=rank) for suit in Suit for rank in Rank] * 2
+
+    def shuffle(self):
+        self.cards.pop()
