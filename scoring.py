@@ -7,6 +7,8 @@ class Meld(NamedTuple):
     nines_of_trump: int = 0
     non_trump_marriages: int = 0
     trump_marriages: int = 0
+    jacks_around: int = 0
+    queens_around: int = 0
     kings_around: int = 0
     aces_around: int = 0
 
@@ -14,12 +16,20 @@ class Meld(NamedTuple):
         return (
             self.nines_of_trump
             + self._score_marriages()
+            + self._score_jacks_around()
+            + self._score_queens_around()
             + self._score_kings_around()
             + self._score_aces_around()
         )
 
     def _score_marriages(self) -> int:
         return self.non_trump_marriages * 2 + self.trump_marriages * 4
+
+    def _score_jacks_around(self):
+        return self._score_around(self.jacks_around, 4)
+
+    def _score_queens_around(self):
+        return self._score_around(self.queens_around, 6)
 
     def _score_kings_around(self):
         return self._score_around(self.kings_around, 8)
@@ -52,6 +62,8 @@ class MeldCounter:
             nines_of_trump=self._nines_of_trump(),
             non_trump_marriages=self._non_trump_marriages(),
             trump_marriages=self._trump_marriages(),
+            jacks_around=self._count_around(Rank.JACK),
+            queens_around=self._count_around(Rank.QUEEN),
             kings_around=self._count_around(Rank.KING),
             aces_around=self._count_around(Rank.ACE),
         )

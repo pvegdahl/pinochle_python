@@ -83,7 +83,7 @@ class TestScoreMeld:
         value: int
 
     @pytest.fixture(
-        scope="module", params=[RankAndValue(Rank.KING, 8), RankAndValue(Rank.ACE, 10)]
+        scope="module", params=[RankAndValue(Rank.JACK, 4), RankAndValue(Rank.QUEEN, 6), RankAndValue(Rank.KING, 8), RankAndValue(Rank.ACE, 10)]
     )
     def rank_and_value(self, request):
         return request.param
