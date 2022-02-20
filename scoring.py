@@ -12,6 +12,7 @@ class Meld(NamedTuple):
     kings_around: int = 0
     aces_around: int = 0
     runs_in_trump: int = 0
+    pinochles: int = 0
 
     def score(self) -> int:
         return (
@@ -22,6 +23,7 @@ class Meld(NamedTuple):
             + self._score_kings_around()
             + self._score_aces_around()
             + self._score_runs_in_trump()
+            + self._score_pinochle()
         )
 
     def _score_marriages(self) -> int:
@@ -52,6 +54,15 @@ class Meld(NamedTuple):
     def _score_runs_in_trump(self):
         return self._score_with_10x_for_double(self.runs_in_trump, 15)
 
+    def _score_pinochle(self):
+        match self.pinochles:
+            case 0:
+                return 0
+            case 1:
+                return 4
+            case 2:
+                return 30
+
 
 def score_meld(hand: List[Card], trump: Suit) -> int:
     meld = MeldCounter(hand=hand, trump=trump).count()
@@ -73,6 +84,7 @@ class MeldCounter:
             kings_around=self._count_around(Rank.KING),
             aces_around=self._count_around(Rank.ACE),
             runs_in_trump=self._runs_in_trump(),
+            pinochles=self._pinochles(),
         )
 
     def _nines_of_trump(self) -> int:
@@ -124,4 +136,11 @@ class MeldCounter:
             return 2
         if len(set(run_cards)) == 5:
             return 1
+        return 0
+
+    def _pinochles(self):
+        jacks_of_diamonds = self.hand.count(Card(Rank.JACK, Suit.DIAMONDS))
+        queens_of_spades = self.hand.count(Card(Rank.QUEEN, Suit.SPADES))
+        if jacks_of_diamonds and queens_of_spades:
+            return int((jacks_of_diamonds + queens_of_spades) / 2)
         return 0

@@ -156,7 +156,31 @@ class TestScoreMeld:
             Card(Rank.JACK, suit),
         ]
 
+    def test_single_pinochle(self):
+        assert (
+            score_meld(
+                hand=[Card(Rank.JACK, Suit.DIAMONDS), Card(Rank.QUEEN, Suit.SPADES)],
+                trump=Suit.CLUBS,
+            )
+            == 4
+        )
 
-# TODO
-# Double run in trump
-# Pinochles
+    def test_double_pinochle(self):
+        hand = [Card(Rank.JACK, Suit.DIAMONDS), Card(Rank.QUEEN, Suit.SPADES)] * 2
+        assert score_meld(hand=hand, trump=Suit.CLUBS) == 30
+
+    def test_extra_jack_pinochle(self):
+        hand = [
+            Card(Rank.JACK, Suit.DIAMONDS),
+            Card(Rank.JACK, Suit.DIAMONDS),
+            Card(Rank.QUEEN, Suit.SPADES),
+        ]
+        assert score_meld(hand=hand, trump=Suit.CLUBS) == 4
+
+    def test_extra_queen_pinochle(self):
+        hand = [
+            Card(Rank.JACK, Suit.DIAMONDS),
+            Card(Rank.QUEEN, Suit.SPADES),
+            Card(Rank.QUEEN, Suit.SPADES),
+        ]
+        assert score_meld(hand=hand, trump=Suit.CLUBS) == 4
