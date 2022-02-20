@@ -83,7 +83,13 @@ class TestScoreMeld:
         value: int
 
     @pytest.fixture(
-        scope="module", params=[RankAndValue(Rank.JACK, 4), RankAndValue(Rank.QUEEN, 6), RankAndValue(Rank.KING, 8), RankAndValue(Rank.ACE, 10)]
+        scope="module",
+        params=[
+            RankAndValue(Rank.JACK, 4),
+            RankAndValue(Rank.QUEEN, 6),
+            RankAndValue(Rank.KING, 8),
+            RankAndValue(Rank.ACE, 10),
+        ],
     )
     def rank_and_value(self, request):
         return request.param
@@ -116,6 +122,27 @@ class TestScoreMeld:
     def test_run_in_trump(self):
         assert score_meld(hand=self._create_run(Suit.HEARTS), trump=Suit.HEARTS) == 15
 
+    def test_run_not_in_trump(self):
+        assert score_meld(hand=self._create_run(Suit.DIAMONDS), trump=Suit.HEARTS) == 2
+
+    def test_run_in_mixed_suits(self):
+        hand = [
+            Card(Rank.ACE, Suit.CLUBS),
+            Card(Rank.TEN, Suit.DIAMONDS),
+            Card(Rank.KING, Suit.HEARTS),
+            Card(Rank.QUEEN, Suit.SPADES),
+            Card(Rank.JACK, Suit.CLUBS),
+        ]
+        assert score_meld(hand=hand, trump=Suit.HEARTS) == 0
+
+    def test_five_cards_in_trump_is_not_a_run(self):
+        assert (
+            score_meld(hand=([Card(Rank.ACE, Suit.HEARTS)] * 5), trump=Suit.HEARTS) == 0
+        )
+
+    # def test_double_run_in_trump(self):
+    #     assert score_meld(hand=(self._create_run(Suit.HEARTS) * 2), trump=Suit.HEARTS) == 150
+
     @staticmethod
     def _create_run(suit: Suit) -> List[Card]:
         return [
@@ -125,3 +152,8 @@ class TestScoreMeld:
             Card(Rank.QUEEN, suit),
             Card(Rank.JACK, suit),
         ]
+
+
+# TODO
+# Double run in trump
+# Pinochles

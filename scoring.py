@@ -72,7 +72,7 @@ class MeldCounter:
             queens_around=self._count_around(Rank.QUEEN),
             kings_around=self._count_around(Rank.KING),
             aces_around=self._count_around(Rank.ACE),
-            runs_in_trump=self._runs_in_trump()
+            runs_in_trump=self._runs_in_trump(),
         )
 
     def _nines_of_trump(self) -> int:
@@ -115,8 +115,11 @@ class MeldCounter:
         return 0
 
     def _runs_in_trump(self) -> int:
-        ranks = [card.rank for card in self.hand if card.rank != Rank.NINE]
-        if len(ranks) == 5:
+        ranks = [
+            card.rank
+            for card in self.hand
+            if card.rank != Rank.NINE and card.suit == self.trump
+        ]
+        if len(set(ranks)) == 5:
             return 1
         return 0
-
