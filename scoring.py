@@ -28,10 +28,10 @@ class Meld(NamedTuple):
         return self.non_trump_marriages * 2 + self.trump_marriages * 4
 
     def _score_jacks_around(self):
-        return self._score_around(self.jacks_around, 4)
+        return self._score_with_10x_for_double(self.jacks_around, 4)
 
     @staticmethod
-    def _score_around(count, base_score):
+    def _score_with_10x_for_double(count, base_score):
         match count:
             case 0:
                 return 0
@@ -41,16 +41,16 @@ class Meld(NamedTuple):
                 return base_score * 10
 
     def _score_queens_around(self):
-        return self._score_around(self.queens_around, 6)
+        return self._score_with_10x_for_double(self.queens_around, 6)
 
     def _score_kings_around(self):
-        return self._score_around(self.kings_around, 8)
+        return self._score_with_10x_for_double(self.kings_around, 8)
 
     def _score_aces_around(self):
-        return self._score_around(self.aces_around, 10)
+        return self._score_with_10x_for_double(self.aces_around, 10)
 
     def _score_runs_in_trump(self):
-        return self.runs_in_trump * 15
+        return self._score_with_10x_for_double(self.runs_in_trump, 15)
 
 
 def score_meld(hand: List[Card], trump: Suit) -> int:
@@ -115,11 +115,13 @@ class MeldCounter:
         return 0
 
     def _runs_in_trump(self) -> int:
-        ranks = [
-            card.rank
+        run_cards = [
+            card
             for card in self.hand
             if card.rank != Rank.NINE and card.suit == self.trump
         ]
-        if len(set(ranks)) == 5:
+        if len(run_cards) == 10:
+            return 2
+        if len(set(run_cards)) == 5:
             return 1
         return 0

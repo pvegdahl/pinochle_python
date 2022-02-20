@@ -140,8 +140,11 @@ class TestScoreMeld:
             score_meld(hand=([Card(Rank.ACE, Suit.HEARTS)] * 5), trump=Suit.HEARTS) == 0
         )
 
-    # def test_double_run_in_trump(self):
-    #     assert score_meld(hand=(self._create_run(Suit.HEARTS) * 2), trump=Suit.HEARTS) == 150
+    def test_double_run_in_trump(self):
+        assert (
+            score_meld(hand=(self._create_run(Suit.HEARTS) * 2), trump=Suit.HEARTS)
+            == 150
+        )
 
     @staticmethod
     def _create_run(suit: Suit) -> List[Card]:
