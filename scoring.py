@@ -29,37 +29,41 @@ class Meld(NamedTuple):
     def _score_marriages(self) -> int:
         return self.non_trump_marriages * 2 + self.trump_marriages * 4
 
-    def _score_jacks_around(self):
+    def _score_jacks_around(self) -> int:
         return self._score_with_10x_for_double(self.jacks_around, 4)
 
     @staticmethod
-    def _score_with_10x_for_double(count, base_score):
+    def _score_with_10x_for_double(count: int, base_score: int) -> int:
         if count == 0:
             return 0
         elif count == 1:
             return base_score
         elif count == 2:
             return 10 * base_score
+        else:
+            raise Exception(f"Count should always be 0, 1, or 2.  Got {count}")
 
-    def _score_queens_around(self):
+    def _score_queens_around(self) -> int:
         return self._score_with_10x_for_double(self.queens_around, 6)
 
-    def _score_kings_around(self):
+    def _score_kings_around(self) -> int:
         return self._score_with_10x_for_double(self.kings_around, 8)
 
-    def _score_aces_around(self):
+    def _score_aces_around(self) -> int:
         return self._score_with_10x_for_double(self.aces_around, 10)
 
-    def _score_runs_in_trump(self):
+    def _score_runs_in_trump(self) -> int:
         return self._score_with_10x_for_double(self.runs_in_trump, 15)
 
-    def _score_pinochle(self):
+    def _score_pinochle(self) -> int:
         if self.pinochles == 0:
             return 0
         elif self.pinochles == 1:
             return 4
         elif self.pinochles == 2:
             return 30
+        else:
+            raise Exception(f"Pinochles should always be 0, 1, or 2.  Got {self.pinochles}")
 
 
 def score_meld(hand: List[Card], trump: Suit) -> int:
@@ -136,7 +140,7 @@ class MeldCounter:
             return 1
         return 0
 
-    def _pinochles(self):
+    def _pinochles(self) -> int:
         jacks_of_diamonds = self.hand.count(Card(Rank.JACK, Suit.DIAMONDS))
         queens_of_spades = self.hand.count(Card(Rank.QUEEN, Suit.SPADES))
         if jacks_of_diamonds and queens_of_spades:

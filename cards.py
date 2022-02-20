@@ -12,7 +12,7 @@ class Suit(Enum):
     HEARTS = "Hearts"
     SPADES = "Spades"
 
-    def __lt__(self, other):
+    def __lt__(self, other: "Suit") -> bool:
         order = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES]
         return order.index(self) < order.index(other)
 
@@ -26,7 +26,7 @@ class Rank(Enum):
     TEN = "Ten"
     ACE = "Ace"
 
-    def __lt__(self, other):
+    def __lt__(self, other: "Rank") -> bool:
         order = [Rank.NINE, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.TEN, Rank.ACE]
         return order.index(self) < order.index(other)
 
@@ -37,7 +37,7 @@ class Card:
     rank: Rank
     suit: Suit
 
-    def __lt__(self, other):
+    def __lt__(self, other: "Card") -> bool:
         if self.suit == other.suit:
             return self.rank < other.rank
         return self.suit < other.suit
@@ -46,7 +46,7 @@ class Card:
 class CardDeck:
     cards: List[Card]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.cards = [Card(suit=suit, rank=rank) for suit in Suit for rank in Rank] * 2
 
     def shuffle(self) -> None:
