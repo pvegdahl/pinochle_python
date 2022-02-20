@@ -112,9 +112,7 @@ class MeldCounter:
         king_count = len(
             [card for card in self.hand if card.rank == Rank.KING and card.suit == suit]
         )
-        if queen_count and king_count:
-            return int((queen_count + king_count) / 2)
-        return 0
+        return min(queen_count, king_count)
 
     def _trump_marriages(self) -> int:
         return self._marriages_in_suit(self.trump) - self._runs_in_trump()
@@ -143,6 +141,4 @@ class MeldCounter:
     def _pinochles(self) -> int:
         jacks_of_diamonds = self.hand.count(Card(Rank.JACK, Suit.DIAMONDS))
         queens_of_spades = self.hand.count(Card(Rank.QUEEN, Suit.SPADES))
-        if jacks_of_diamonds and queens_of_spades:
-            return int((jacks_of_diamonds + queens_of_spades) / 2)
-        return 0
+        return min(jacks_of_diamonds, queens_of_spades)
