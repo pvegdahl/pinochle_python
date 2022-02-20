@@ -117,3 +117,38 @@ class TestCardDeckDeal:
         for hand in hands:
             all_cards.extend(hand)
         _validate_all_cards_present(all_cards)
+
+
+class TestForMutMut:
+    """
+    These tests seem unnecessary, but they reduce MutMut noise
+    """
+    def test_enum_names(self):
+        assert Suit.CLUBS.value == "Clubs"
+        assert Suit.DIAMONDS.value == "Diamonds"
+        assert Suit.HEARTS.value == "Hearts"
+        assert Suit.SPADES.value == "Spades"
+
+        assert Rank.NINE.value == "Nine"
+        assert Rank.JACK.value == "Jack"
+        assert Rank.QUEEN.value == "Queen"
+        assert Rank.KING.value == "King"
+        assert Rank.TEN.value == "Ten"
+        assert Rank.ACE.value == "Ace"
+
+    def test_enum_less_or_greater_than_self_checks(self):
+        for suit in Suit:
+            assert not suit < suit
+            assert not suit > suit
+
+        for rank in Rank:
+            assert not rank < rank
+            assert not rank > rank
+
+    def test_card_less_or_greater_than_self_checks(self):
+        card = Card(Rank.QUEEN, Suit.SPADES)
+        assert not card < card
+        assert not card > card
+
+
+
