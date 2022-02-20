@@ -4,15 +4,15 @@ from cards import Card, Suit, Rank
 
 
 class Meld(NamedTuple):
-    nines_of_trump: int = 0
-    non_trump_marriages: int = 0
-    trump_marriages: int = 0
-    jacks_around: int = 0
-    queens_around: int = 0
-    kings_around: int = 0
-    aces_around: int = 0
-    runs_in_trump: int = 0
-    pinochles: int = 0
+    nines_of_trump: int
+    non_trump_marriages: int
+    trump_marriages: int
+    jacks_around: int
+    queens_around: int
+    kings_around: int
+    aces_around: int
+    runs_in_trump: int
+    pinochles: int
 
     def score(self) -> int:
         return (
@@ -34,13 +34,12 @@ class Meld(NamedTuple):
 
     @staticmethod
     def _score_with_10x_for_double(count, base_score):
-        match count:
-            case 0:
-                return 0
-            case 1:
-                return base_score
-            case 2:
-                return base_score * 10
+        if count == 0:
+            return 0
+        elif count == 1:
+            return base_score
+        elif count == 2:
+            return 10 * base_score
 
     def _score_queens_around(self):
         return self._score_with_10x_for_double(self.queens_around, 6)
@@ -55,13 +54,12 @@ class Meld(NamedTuple):
         return self._score_with_10x_for_double(self.runs_in_trump, 15)
 
     def _score_pinochle(self):
-        match self.pinochles:
-            case 0:
-                return 0
-            case 1:
-                return 4
-            case 2:
-                return 30
+        if self.pinochles == 0:
+            return 0
+        elif self.pinochles == 1:
+            return 4
+        elif self.pinochles == 2:
+            return 30
 
 
 def score_meld(hand: List[Card], trump: Suit) -> int:

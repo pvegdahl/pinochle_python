@@ -1,12 +1,11 @@
 import functools
 import random
 from dataclasses import dataclass
-from enum import Enum, unique, auto, IntEnum
+from enum import Enum
 from typing import List, Tuple
 
 
 @functools.total_ordering
-@unique
 class Suit(Enum):
     CLUBS = "Clubs"
     DIAMONDS = "Diamonds"
@@ -19,7 +18,6 @@ class Suit(Enum):
 
 
 @functools.total_ordering
-@unique
 class Rank(Enum):
     NINE = "Nine"
     JACK = "Jack"
