@@ -59,7 +59,9 @@ def test_player_can_pass_and_is_removed_from_bidding(
     player: str, expected: Tuple[str, ...], players: Tuple[str, ...]
 ) -> None:
     bidding_state = BiddingState(
-        current_bid=25, active_players=players, current_player_index=players.index(player)
+        current_bid=25,
+        active_players=players,
+        current_player_index=players.index(player),
     )
     bidding_state = bidding_state.pass_bidding(player)
     assert bidding_state.active_players == expected

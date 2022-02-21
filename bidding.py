@@ -40,4 +40,6 @@ class BiddingState(NamedTuple):
             player=player,
             message=f"Player {player} cannot pass on {self.current_player()}'s turn",
         )
-        return self._replace(active_players=tuple(p for p in self.active_players if p != player))
+        return self._replace(
+            active_players=tuple(p for p in self.active_players if p != player)
+        )
