@@ -15,6 +15,11 @@ def bidding_state(players: Tuple[str, ...]) -> BiddingState:
     return BiddingState(current_bid=25, active_players=players)
 
 
+@pytest.fixture(scope="session")
+def bidding_state_with_single_remaining_player():
+    return BiddingState(current_bid=35, active_players=("a",))
+
+
 def test_bid_updates_current_bid(bidding_state: BiddingState) -> None:
     bidding_state = bidding_state.new_bid(bid=26, player="a")
     assert bidding_state.current_bid == 26
@@ -32,6 +37,14 @@ def test_reject_equal_bids(bidding_state: BiddingState) -> None:
     assert e.match("New bid of 25 did not exceed the current bid of 25")
 
 
+def test_reject_bids_with_only_one_player_left(
+    bidding_state_with_single_remaining_player: BiddingState,
+) -> None:
+    with pytest.raises(InvalidBid) as e:
+        bidding_state_with_single_remaining_player.new_bid(40, "a")
+    assert e.match("Bidding is over")
+
+
 def test_update_current_bidder(bidding_state: BiddingState) -> None:
     for expected_bidder in ["a", "b", "c", "d", "a"]:
         assert bidding_state.current_player() == expected_bidder
@@ -43,7 +56,7 @@ def test_update_current_bidder(bidding_state: BiddingState) -> None:
 def test_reject_bids_by_wrong_player(bidding_state: BiddingState) -> None:
     with pytest.raises(InvalidBid) as e:
         bidding_state.new_bid(bid=26, player="b")
-    assert e.match("Player b cannot bid on a's turn")
+    assert e.match("b cannot take actions on a's turn")
 
 
 @pytest.mark.parametrize(
@@ -58,12 +71,16 @@ def test_reject_bids_by_wrong_player(bidding_state: BiddingState) -> None:
 def test_player_can_pass_and_is_removed_from_bidding(
     active_player: str, expected: Tuple[str, ...], players: Tuple[str, ...]
 ) -> None:
-    bidding_state = _create_bidding_state_with_active_player(active_player=active_player, players=players)
+    bidding_state = _create_bidding_state_with_active_player(
+        active_player=active_player, players=players
+    )
     bidding_state = bidding_state.pass_bidding(active_player)
     assert bidding_state.active_players == expected
 
 
-def _create_bidding_state_with_active_player(active_player: str, players: Tuple[str, ...]):
+def _create_bidding_state_with_active_player(
+    active_player: str, players: Tuple[str, ...]
+) -> BiddingState:
     return BiddingState(
         current_bid=25,
         active_players=players,
@@ -71,27 +88,52 @@ def _create_bidding_state_with_active_player(active_player: str, players: Tuple[
     )
 
 
-
 @pytest.mark.parametrize("player", ["b", "c", "d"])
-def test_only_current_bidder_can_pass(player, bidding_state):
+def test_only_current_bidder_can_pass(player: str, bidding_state: BiddingState) -> None:
     with pytest.raises(InvalidBid) as e:
         bidding_state.pass_bidding(player)
-    assert e.match(f"Player {player} cannot pass on a's turn")
+    assert e.match(f"{player} cannot take actions on a's turn")
 
 
-@pytest.mark.parametrize("active_player, expected", [
-    ("a", "b"),
-    ("b", "c"),
-    ("c", "d"),
-    ("d", "a"),
-])
-def test_passing_moves_to_correct_next_player(active_player, expected, players):
-    bidding_state = _create_bidding_state_with_active_player(active_player=active_player, players=players)
+@pytest.mark.parametrize(
+    "active_player, expected",
+    [
+        ("a", "b"),
+        ("b", "c"),
+        ("c", "d"),
+        ("d", "a"),
+    ],
+)
+def test_passing_moves_to_correct_next_player(
+    active_player: str, expected: str, players: Tuple[str, ...]
+) -> None:
+    bidding_state = _create_bidding_state_with_active_player(
+        active_player=active_player, players=players
+    )
     bidding_state = bidding_state.pass_bidding(active_player)
     assert bidding_state.current_player() == expected
 
-# Bidding rotation still works with less than 4 players
-# Passing moves to correct next player
-# Bidding ends when there is only one bidder
+
+def test_bidding_rotation_as_players_are_passing(bidding_state: BiddingState) -> None:
+    bidding_state = (
+        bidding_state.pass_bidding("a")
+        .new_bid(26, "b")
+        .new_bid(27, "c")
+        .new_bid(28, "d")
+    )
+    assert bidding_state.current_player() == "b"
+    bidding_state = bidding_state.new_bid(29, "b").new_bid(30, "c").pass_bidding("d")
+    assert bidding_state.current_player() == "b"
+    bidding_state = bidding_state.pass_bidding("b")
+    assert bidding_state.current_player() == "c"
+
+
+def test_no_passing_with_only_one_player_left(
+    bidding_state_with_single_remaining_player: BiddingState,
+) -> None:
+    with pytest.raises(InvalidBid) as e:
+        bidding_state_with_single_remaining_player.pass_bidding("a")
+    assert e.match("Bidding is over")
+
+
 # Winning bidder is the last one standing
-# Bidder who passes is the one actually removed
