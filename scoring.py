@@ -90,13 +90,10 @@ class MeldCounter:
         )
 
     def _nines_of_trump(self) -> int:
-        return len([card for card in self.hand if card == Card(Rank.NINE, self.trump)])
+        return self.hand.count(Card(Rank.NINE, self.trump))
 
     def _non_trump_marriages(self) -> int:
-        result = 0
-        for suit in self._non_trump_suits():
-            result += self._marriages_in_suit(suit)
-        return result
+        return sum(self._marriages_in_suit(suit) for suit in self._non_trump_suits())
 
     def _non_trump_suits(self) -> List[Suit]:
         return [suit for suit in Suit if suit != self.trump]
@@ -112,27 +109,10 @@ class MeldCounter:
         return self._marriages_in_suit(self.trump) - self._runs_in_trump()
 
     def _count_around(self, rank: Rank) -> int:
-        matching_cards = [card for card in self.hand if card.rank == rank]
-        if len(matching_cards) == 8:
-            return 2
-        suits = set(card.suit for card in matching_cards)
-        if len(suits) == 4:
-            return 1
-        return 0
+        return self._count_combinations([Card(rank, suit) for suit in Suit])
 
     def _runs_in_trump(self) -> int:
-        run_cards = [
-            card
-            for card in self.hand
-            if card.rank != Rank.NINE and card.suit == self.trump
-        ]
-        if len(run_cards) == 10:
-            return 2
-        if len(set(run_cards)) == 5:
-            return 1
-        return 0
+        return self._count_combinations([Card(rank, self.trump) for rank in Rank if rank != Rank.NINE])
 
     def _pinochles(self) -> int:
-        jacks_of_diamonds = self.hand.count(Card(Rank.JACK, Suit.DIAMONDS))
-        queens_of_spades = self.hand.count(Card(Rank.QUEEN, Suit.SPADES))
-        return min(jacks_of_diamonds, queens_of_spades)
+        return self._count_combinations([Card(Rank.JACK, Suit.DIAMONDS), Card(Rank.QUEEN, Suit.SPADES)])
