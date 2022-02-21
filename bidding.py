@@ -7,7 +7,7 @@ class InvalidBid(Exception):
 
 class BiddingState(NamedTuple):
     current_bid: int
-    players: Tuple[str, str, str, str]
+    players: Tuple[str, ...]
     current_bidder_index: int = 0
 
     def new_bid(self, bid: int, player: str) -> "BiddingState":
@@ -28,3 +28,6 @@ class BiddingState(NamedTuple):
 
     def current_bidder(self) -> str:
         return self.players[self.current_bidder_index]
+
+    def pass_bidding(self, player: str) -> "BiddingState":
+        return self._replace(players=tuple(p for p in self.players if p != player))
