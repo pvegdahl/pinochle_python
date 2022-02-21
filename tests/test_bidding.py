@@ -34,9 +34,9 @@ def test_reject_equal_bids(bidding_state: BiddingState) -> None:
 
 def test_update_current_bidder(bidding_state: BiddingState) -> None:
     for expected_bidder in ["a", "b", "c", "d", "a"]:
-        assert bidding_state.current_bidder() == expected_bidder
+        assert bidding_state.current_player() == expected_bidder
         bidding_state = bidding_state.new_bid(
-            bid=bidding_state.current_bid + 1, player=bidding_state.current_bidder()
+            bid=bidding_state.current_bid + 1, player=bidding_state.current_player()
         )
 
 
@@ -59,7 +59,7 @@ def test_player_can_pass_and_is_removed_from_bidding(
     player: str, expected: Tuple[str, ...], players: Tuple[str, ...]
 ) -> None:
     bidding_state = BiddingState(
-        current_bid=25, players=players, current_bidder_index=players.index(player)
+        current_bid=25, players=players, current_player_index=players.index(player)
     )
     bidding_state = bidding_state.pass_bidding(player)
     assert bidding_state.players == expected
