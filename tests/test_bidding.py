@@ -28,13 +28,13 @@ def test_bid_updates_current_bid(bidding_state: BiddingState) -> None:
 def test_reject_lower_bids(bidding_state: BiddingState) -> None:
     with pytest.raises(InvalidBid) as e:
         bidding_state.new_bid(bid=24, player="a")
-    assert e.match("New bid of 24 did not exceed the current bid of 25")
+    assert e.value.args[0] == "New bid of 24 did not exceed the current bid of 25"
 
 
 def test_reject_equal_bids(bidding_state: BiddingState) -> None:
     with pytest.raises(InvalidBid) as e:
         bidding_state.new_bid(bid=25, player="a")
-    assert e.match("New bid of 25 did not exceed the current bid of 25")
+    assert e.value.args[0] == "New bid of 25 did not exceed the current bid of 25"
 
 
 def test_reject_bids_with_only_one_player_left(
@@ -42,7 +42,7 @@ def test_reject_bids_with_only_one_player_left(
 ) -> None:
     with pytest.raises(InvalidBid) as e:
         bidding_state_with_single_remaining_player.new_bid(40, "bid_winner")
-    assert e.match("Bidding is over")
+    assert e.value.args[0] == "Bidding is over"
 
 
 def test_update_current_bidder(bidding_state: BiddingState) -> None:
@@ -133,7 +133,7 @@ def test_no_passing_with_only_one_player_left(
 ) -> None:
     with pytest.raises(InvalidBid) as e:
         bidding_state_with_single_remaining_player.pass_bidding("bid_winner")
-    assert e.match("Bidding is over")
+    assert e.value.args[0] == "Bidding is over"
 
 
 def test_winning_bidder_is_last_player_standing(bidding_state_with_single_remaining_player: BiddingState) -> None:
