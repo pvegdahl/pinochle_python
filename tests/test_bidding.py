@@ -12,7 +12,7 @@ def players() -> Tuple[str, ...]:
 
 @pytest.fixture(scope="session")
 def bidding_state(players: Tuple[str, ...]) -> BiddingState:
-    return BiddingState(current_bid=25, players=players)
+    return BiddingState(current_bid=25, active_players=players)
 
 
 def test_bid_updates_current_bid(bidding_state: BiddingState) -> None:
@@ -59,10 +59,10 @@ def test_player_can_pass_and_is_removed_from_bidding(
     player: str, expected: Tuple[str, ...], players: Tuple[str, ...]
 ) -> None:
     bidding_state = BiddingState(
-        current_bid=25, players=players, current_player_index=players.index(player)
+        current_bid=25, active_players=players, current_player_index=players.index(player)
     )
     bidding_state = bidding_state.pass_bidding(player)
-    assert bidding_state.players == expected
+    assert bidding_state.active_players == expected
 
 
 @pytest.mark.parametrize("player", ["b", "c", "d"])

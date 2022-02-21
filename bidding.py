@@ -7,7 +7,7 @@ class InvalidBid(Exception):
 
 class BiddingState(NamedTuple):
     current_bid: int
-    players: Tuple[str, ...]
+    active_players: Tuple[str, ...]
     current_player_index: int = 0
 
     def new_bid(self, bid: int, player: str) -> "BiddingState":
@@ -33,11 +33,11 @@ class BiddingState(NamedTuple):
         return (self.current_player_index + 1) % 4
 
     def current_player(self) -> str:
-        return self.players[self.current_player_index]
+        return self.active_players[self.current_player_index]
 
     def pass_bidding(self, player: str) -> "BiddingState":
         self._validate_current_player(
             player=player,
             message=f"Player {player} cannot pass on {self.current_player()}'s turn",
         )
-        return self._replace(players=tuple(p for p in self.players if p != player))
+        return self._replace(active_players=tuple(p for p in self.active_players if p != player))
