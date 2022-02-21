@@ -17,7 +17,7 @@ def bidding_state(players: Tuple[str, ...]) -> BiddingState:
 
 @pytest.fixture(scope="session")
 def bidding_state_with_single_remaining_player():
-    return BiddingState(current_bid=35, active_players=("a",))
+    return BiddingState(current_bid=35, active_players=("bid_winner",))
 
 
 def test_bid_updates_current_bid(bidding_state: BiddingState) -> None:
@@ -41,7 +41,7 @@ def test_reject_bids_with_only_one_player_left(
     bidding_state_with_single_remaining_player: BiddingState,
 ) -> None:
     with pytest.raises(InvalidBid) as e:
-        bidding_state_with_single_remaining_player.new_bid(40, "a")
+        bidding_state_with_single_remaining_player.new_bid(40, "bid_winner")
     assert e.match("Bidding is over")
 
 
@@ -132,8 +132,15 @@ def test_no_passing_with_only_one_player_left(
     bidding_state_with_single_remaining_player: BiddingState,
 ) -> None:
     with pytest.raises(InvalidBid) as e:
-        bidding_state_with_single_remaining_player.pass_bidding("a")
+        bidding_state_with_single_remaining_player.pass_bidding("bid_winner")
     assert e.match("Bidding is over")
 
+
+def test_winning_bidder_is_last_player_standing(bidding_state_with_single_remaining_player: BiddingState) -> None:
+    assert bidding_state_with_single_remaining_player.get_winner() == "bid_winner"
+
+
+def test_no_winning_bidder_with_multiple_players_left(bidding_state: BiddingState) -> None:
+    assert bidding_state.get_winner() is None
 
 # Winning bidder is the last one standing

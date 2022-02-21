@@ -1,4 +1,4 @@
-from typing import NamedTuple, Tuple
+from typing import NamedTuple, Tuple, Optional
 
 
 class InvalidBid(Exception):
@@ -51,3 +51,8 @@ class BiddingState(NamedTuple):
     def _get_next_bidder_index_when_passing(self):
         new_active_players_size = len(self.active_players) - 1
         return self.current_player_index % new_active_players_size
+
+    def get_winner(self) -> Optional[str]:
+        if len(self.active_players) == 1:
+            return self.active_players[0]
+        return None
