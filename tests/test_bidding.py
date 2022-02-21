@@ -47,7 +47,7 @@ def test_reject_bids_by_wrong_player(bidding_state: BiddingState) -> None:
 
 
 @pytest.mark.parametrize(
-    "player, expected",
+    "active_player, expected",
     [
         ("a", ("b", "c", "d")),
         ("b", ("a", "c", "d")),
@@ -56,15 +56,20 @@ def test_reject_bids_by_wrong_player(bidding_state: BiddingState) -> None:
     ],
 )
 def test_player_can_pass_and_is_removed_from_bidding(
-    player: str, expected: Tuple[str, ...], players: Tuple[str, ...]
+    active_player: str, expected: Tuple[str, ...], players: Tuple[str, ...]
 ) -> None:
-    bidding_state = BiddingState(
+    bidding_state = _create_bidding_state_with_active_player(active_player=active_player, players=players)
+    bidding_state = bidding_state.pass_bidding(active_player)
+    assert bidding_state.active_players == expected
+
+
+def _create_bidding_state_with_active_player(active_player: str, players: Tuple[str, ...]):
+    return BiddingState(
         current_bid=25,
         active_players=players,
-        current_player_index=players.index(player),
+        current_player_index=players.index(active_player),
     )
-    bidding_state = bidding_state.pass_bidding(player)
-    assert bidding_state.active_players == expected
+
 
 
 @pytest.mark.parametrize("player", ["b", "c", "d"])
@@ -74,6 +79,19 @@ def test_only_current_bidder_can_pass(player, bidding_state):
     assert e.match(f"Player {player} cannot pass on a's turn")
 
 
+@pytest.mark.parametrize("active_player, expected", [
+    ("a", "b"),
+    ("b", "c"),
+    ("c", "d"),
+    ("d", "a"),
+])
+def test_passing_moves_to_correct_next_player(active_player, expected, players):
+    bidding_state = _create_bidding_state_with_active_player(active_player=active_player, players=players)
+    bidding_state = bidding_state.pass_bidding(active_player)
+    assert bidding_state.current_player() == expected
+
+# Bidding rotation still works with less than 4 players
+# Passing moves to correct next player
 # Bidding ends when there is only one bidder
 # Winning bidder is the last one standing
 # Bidder who passes is the one actually removed

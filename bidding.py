@@ -42,6 +42,11 @@ class BiddingState(NamedTuple):
             player=player,
             message=f"Player {player} cannot pass on {self.current_player()}'s turn",
         )
+
         return self._replace(
-            active_players=tuple(p for p in self.active_players if p != player)
+            active_players=tuple(p for p in self.active_players if p != player),
+            current_player_index=self._get_next_bidder_index_when_passing(),
         )
+
+    def _get_next_bidder_index_when_passing(self):
+        return self.current_player_index % (len(self.active_players) - 1)
