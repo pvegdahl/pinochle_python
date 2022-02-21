@@ -136,11 +136,16 @@ def test_no_passing_with_only_one_player_left(
     assert e.value.args[0] == "Bidding is over"
 
 
-def test_winning_bidder_is_last_player_standing(bidding_state_with_single_remaining_player: BiddingState) -> None:
+def test_winning_bidder_is_last_player_standing(
+    bidding_state_with_single_remaining_player: BiddingState,
+) -> None:
     assert bidding_state_with_single_remaining_player.get_winner() == "bid_winner"
 
 
-def test_no_winning_bidder_with_multiple_players_left(bidding_state: BiddingState) -> None:
+def test_no_winning_bidder_with_multiple_players_left(
+    bidding_state: BiddingState,
+) -> None:
     assert bidding_state.get_winner() is None
+
 
 # Winning bidder is the last one standing

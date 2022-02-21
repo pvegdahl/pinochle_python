@@ -49,7 +49,9 @@ class CardDeck:
         return tuple(random.sample(cards, k=len(cards)))
 
     @classmethod
-    def deal(cls, shuffle: bool = True) -> Tuple[Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...]]:
+    def deal(
+        cls, shuffle: bool = True
+    ) -> Tuple[Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...]]:
         cards = cls.generate_cards()
         if shuffle:
             cards = cls.shuffle(cards)
