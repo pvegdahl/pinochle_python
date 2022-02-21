@@ -18,7 +18,7 @@ def new_game(players: Tuple[str, str, str, str]) -> PinochleGame:
 
 
 @pytest.fixture(scope="session")
-def bidding_complete_game(players: Tuple[str, str, str, str]) -> PinochleGame:
+def game_bidding_complete(players: Tuple[str, str, str, str]) -> PinochleGame:
     return PinochleGame(
         state=GameState.BIDDING,
         players=players,
@@ -43,14 +43,14 @@ def test_no_trump_at_start(new_game) -> None:
 
 @pytest.mark.parametrize("trump_suit", [suit for suit in Suit])
 def test_set_trump_does_what_it_says(
-    trump_suit: Suit, bidding_complete_game: PinochleGame
+    trump_suit: Suit, game_bidding_complete: PinochleGame
 ) -> None:
-    game = bidding_complete_game.select_trump(player="a", trump=trump_suit)
+    game = game_bidding_complete.select_trump(player="a", trump=trump_suit)
     assert game.trump == trump_suit
 
 
 def test_set_trump_advances_state_to_passing(
-    bidding_complete_game: PinochleGame,
+    game_bidding_complete: PinochleGame,
 ) -> None:
-    game = bidding_complete_game.select_trump(player="a", trump=Suit.DIAMONDS)
-    assert game.state == GameState.PASSING
+    game = game_bidding_complete.select_trump(player="a", trump=Suit.DIAMONDS)
+    assert game.state == GameState.PASSING_TO_BID_WINNER

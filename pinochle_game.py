@@ -7,7 +7,7 @@ from cards import Card, CardDeck, Suit
 
 class GameState(Enum):
     BIDDING = "Bidding"
-    PASSING = "Passing"
+    PASSING_TO_BID_WINNER = "PassingToBidWinner"
 
 
 class PinochleGame(NamedTuple):
@@ -28,4 +28,4 @@ class PinochleGame(NamedTuple):
         )
 
     def select_trump(self, player: str, trump: Suit) -> "PinochleGame":
-        return self._replace(trump=trump, state=GameState.PASSING)
+        return self._replace(trump=trump, state=GameState.PASSING_TO_BID_WINNER)
