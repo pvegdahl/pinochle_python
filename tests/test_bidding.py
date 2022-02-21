@@ -74,7 +74,6 @@ def test_only_current_bidder_can_pass(player, bidding_state):
     assert e.match(f"Player {player} cannot pass on a's turn")
 
 
-# Only current bidder can pass
 # Bidding ends when there is only one bidder
 # Winning bidder is the last one standing
 # Bidder who passes is the one actually removed
