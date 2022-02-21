@@ -44,13 +44,17 @@ class Card:
 
 
 class CardDeck:
-    cards: List[Card]
+    @staticmethod
+    def shuffle(cards: Tuple[Card]) -> Tuple[Card]:
+        return tuple(random.sample(cards, k=len(cards)))
 
-    def __init__(self) -> None:
-        self.cards = [Card(suit=suit, rank=rank) for suit in Suit for rank in Rank] * 2
+    @classmethod
+    def deal(cls, shuffle: bool = True) -> Tuple[Tuple[Card], ...]:
+        cards = cls.generate_cards()
+        if shuffle:
+            cards = cls.shuffle(cards)
+        return cards[:12], cards[12:24], cards[24:36], cards[36:]
 
-    def shuffle(self) -> None:
-        random.shuffle(self.cards)
-
-    def deal(self) -> Tuple[List[Card], ...]:
-        return self.cards[:12], self.cards[12:24], self.cards[24:36], self.cards[36:]
+    @staticmethod
+    def generate_cards() -> Tuple[Card]:
+        return tuple(Card(suit=suit, rank=rank) for suit in Suit for rank in Rank) * 2

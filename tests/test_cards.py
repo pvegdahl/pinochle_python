@@ -46,13 +46,13 @@ def test_suit_ordering(lower, higher):
 
 @pytest.mark.parametrize("suit", [pytest.param(suit, id=suit.name) for suit in Suit])
 def test_twelve_of_each_suit_in_deck(suit):
-    cards_of_suit = [card for card in CardDeck().cards if card.suit == suit]
+    cards_of_suit = [card for card in CardDeck().generate_cards() if card.suit == suit]
     assert len(cards_of_suit) == 12
 
 
 @pytest.mark.parametrize("rank", [pytest.param(rank, id=rank.name) for rank in Rank])
 def test_eight_of_each_rank_in_deck(rank):
-    cards_of_rank = [card for card in CardDeck().cards if card.rank == rank]
+    cards_of_rank = [card for card in CardDeck().generate_cards() if card.rank == rank]
     assert len(cards_of_rank) == 8
 
 
@@ -60,11 +60,11 @@ def test_eight_of_each_rank_in_deck(rank):
     "card",
     [
         pytest.param(card, id=f"{card.rank.name} of {card.suit.name}")
-        for card in set(CardDeck().cards)
+        for card in set(CardDeck().generate_cards())
     ],
 )
 def test_each_card_exists_exactly_twice(card):
-    assert len([c for c in CardDeck().cards if c == card]) == 2
+    assert len([c for c in CardDeck().generate_cards() if c == card]) == 2
 
 
 @pytest.mark.parametrize(
@@ -81,26 +81,20 @@ def test_card_ordering(lower_card, higher_card):
 
 
 class TestCardDeckShuffle:
-    def test_different_order(self):
-        deck = CardDeck()
-        deck.shuffle()
-        assert deck.cards != CardDeck().cards
-
     def test_all_cards_still_exist(self):
-        deck = CardDeck()
-        deck.shuffle()
-        _validate_all_cards_present(deck.cards)
+        cards = CardDeck.shuffle(CardDeck.generate_cards())
+        _validate_all_cards_present(cards)
 
     def test_shuffling_wont_repeat_anytime_in_1000_iterations(self):
-        original_card_order = CardDeck().cards
-        deck = CardDeck()
+        original_card_order = CardDeck.generate_cards()
+        cards = original_card_order
         for _ in range(1000):
-            deck.shuffle()
-            assert deck.cards != original_card_order
+            cards = CardDeck.shuffle(cards)
+            assert cards != original_card_order
 
 
 def _validate_all_cards_present(cards):
-    assert sorted(cards) == sorted(CardDeck().cards)
+    assert sorted(cards) == sorted(CardDeck.generate_cards())
 
 
 class TestCardDeckDeal:
