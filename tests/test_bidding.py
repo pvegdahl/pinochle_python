@@ -21,5 +21,3 @@ def test_reject_equal_bids():
     with pytest.raises(InvalidBid) as e:
         bid.new_bid(25)
     assert e.match("New bid of 25 did not exceed the current bid of 25")
-
-

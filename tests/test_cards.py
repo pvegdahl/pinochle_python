@@ -123,6 +123,7 @@ class TestForMutMut:
     """
     These tests seem unnecessary, but they reduce MutMut noise
     """
+
     def test_enum_names(self):
         assert Suit.CLUBS.value == "Clubs"
         assert Suit.DIAMONDS.value == "Diamonds"
@@ -149,6 +150,3 @@ class TestForMutMut:
         card = Card(Rank.QUEEN, Suit.SPADES)
         assert not card < card
         assert not card > card
-
-
-

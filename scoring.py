@@ -63,7 +63,9 @@ class Meld(NamedTuple):
         elif self.pinochles == 2:
             return 30
         else:
-            raise Exception(f"Pinochles should always be 0, 1, or 2.  Got {self.pinochles}")
+            raise Exception(
+                f"Pinochles should always be 0, 1, or 2.  Got {self.pinochles}"
+            )
 
 
 def score_meld(hand: List[Card], trump: Suit) -> int:
@@ -112,7 +114,11 @@ class MeldCounter:
         return self._count_combinations([Card(rank, suit) for suit in Suit])
 
     def _runs_in_trump(self) -> int:
-        return self._count_combinations([Card(rank, self.trump) for rank in Rank if rank != Rank.NINE])
+        return self._count_combinations(
+            [Card(rank, self.trump) for rank in Rank if rank != Rank.NINE]
+        )
 
     def _pinochles(self) -> int:
-        return self._count_combinations([Card(Rank.JACK, Suit.DIAMONDS), Card(Rank.QUEEN, Suit.SPADES)])
+        return self._count_combinations(
+            [Card(Rank.JACK, Suit.DIAMONDS), Card(Rank.QUEEN, Suit.SPADES)]
+        )
