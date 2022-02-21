@@ -102,17 +102,11 @@ class MeldCounter:
         return [suit for suit in Suit if suit != self.trump]
 
     def _marriages_in_suit(self, suit: Suit) -> int:
-        queen_count = len(
-            [
-                card
-                for card in self.hand
-                if card.rank == Rank.QUEEN and card.suit == suit
-            ]
-        )
-        king_count = len(
-            [card for card in self.hand if card.rank == Rank.KING and card.suit == suit]
-        )
-        return min(queen_count, king_count)
+        return self._count_combinations([Card(Rank.QUEEN, suit), Card(Rank.KING, suit)])
+
+    def _count_combinations(self, target_cards):
+        card_counts = [self.hand.count(card) for card in target_cards]
+        return min(card_counts)
 
     def _trump_marriages(self) -> int:
         return self._marriages_in_suit(self.trump) - self._runs_in_trump()
