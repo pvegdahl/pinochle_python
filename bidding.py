@@ -10,7 +10,12 @@ class BiddingState(NamedTuple):
     players: Tuple[str, str, str, str]
     current_bidder_index: int = 0
 
-    def new_bid(self, bid: int) -> "BiddingState":
+    def new_bid(self, bid: int, player: str = None) -> "BiddingState":
+        if player is not None and player != self.current_bidder():
+            raise InvalidBid(
+                f"Player {player} cannot bid on {self.current_bidder}'s turn"
+            )
+
         if bid <= self.current_bid:
             raise InvalidBid(
                 f"New bid of {bid} did not exceed the current bid of {self.current_bid}"

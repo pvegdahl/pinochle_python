@@ -26,14 +26,11 @@ def test_reject_equal_bids(bidding_state: BiddingState) -> None:
 
 
 def test_update_current_bidder(bidding_state: BiddingState) -> None:
-    assert bidding_state.current_bidder() == "a"
-    bidding_state = bidding_state.new_bid(26)
-    assert bidding_state.current_bidder() == "b"
-    bidding_state = bidding_state.new_bid(27)
-    assert bidding_state.current_bidder() == "c"
-    bidding_state = bidding_state.new_bid(28)
-    assert bidding_state.current_bidder() == "d"
-    bidding_state = bidding_state.new_bid(29)
-    assert bidding_state.current_bidder() == "a"
+    for expected_bidder in ["a", "b", "c", "d", "a"]:
+        assert bidding_state.current_bidder() == expected_bidder
+        bidding_state = bidding_state.new_bid(bidding_state.current_bid+1)
 
-# def test_reject_bids_by_wrong_player()
+
+def test_reject_bids_by_wrong_player(bidding_state):
+    with pytest.raises(InvalidBid) as e:
+        bidding_state.new_bid(bid=26, player="b")
