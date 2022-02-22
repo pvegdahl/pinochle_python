@@ -49,7 +49,9 @@ class CardDeck:
         return tuple(random.sample(cards, k=len(cards)))
 
     @classmethod
-    def deal(cls) -> Tuple[Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...]]:
+    def deal(
+        cls,
+    ) -> Tuple[Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...], Tuple[Card, ...]]:
         cards = cls._shuffled_cards()
         return cards[:12], cards[12:24], cards[24:36], cards[36:]
 

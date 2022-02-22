@@ -29,3 +29,10 @@ class PinochleGame(NamedTuple):
 
     def select_trump(self, player: str, trump: Suit) -> "PinochleGame":
         return self._replace(trump=trump, state=GameState.PASSING_TO_BID_WINNER)
+
+    def pass_cards(
+        self, source: str, destination: str, cards: Tuple[Card, Card, Card, Card]
+    ) -> "PinochleGame":
+        new_hand = self.hands[0] + cards
+        new_hands = (new_hand, self.hands[1], self.hands[2], self.hands[3])
+        return self._replace(hands=new_hands)

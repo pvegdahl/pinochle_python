@@ -86,7 +86,7 @@ class TestCardDeckShuffle:
 
     def test_shuffling_wont_repeat_anytime_in_1000_iterations(self):
         card_orders = set()
-        for size in range(1,1000):
+        for size in range(1, 1000):
             card_orders.add(CardDeck._shuffled_cards())
             assert len(card_orders) == size
 
