@@ -25,6 +25,9 @@ class PassingCards(NamedTuple):
         if source != self.partner or destination != self.bid_winner:
             raise IllegalPass(f"The only legal pass is from {self.partner} to {self.bid_winner}")
 
+        if len(cards) != 4:
+            raise IllegalPass(f"Passes must be exactly 4 cards, not {len(cards)}")
+
     @classmethod
     def _remove_cards_from_hand(
             cls, initial_hand: Tuple[Card, ...], cards_to_remove: Tuple[Card, ...]

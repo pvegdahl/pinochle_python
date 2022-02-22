@@ -98,25 +98,19 @@ def test_initial_pass_must_be_from_partner_to_winner(source, destination, passin
     assert e.value.args[0] == "The only legal pass is from c to a"
 
 
-# def test_no_pass_legal_before_passing_phase(game_bidding_complete: PinochleGame, passed_cards) -> None:
-#     with pytest.raises(IllegalPass) as e:
-#         game_bidding_complete.pass_cards(source="c", destination="a", cards=passed_cards)
-#     assert e.value.args[0] == "You cannot pass cards in the Bidding phase"
-#
-#
-# @pytest.mark.parametrize("num_cards_to_pass", [0, 1, 2, 3, 5, 6])
-# def test_pass_must_be_exactly_four_cards(game_ready_to_pass: PinochleGame, num_cards_to_pass) -> None:
-#     passed_cards = game_ready_to_pass.hands[2][:num_cards_to_pass]
-#     with pytest.raises(IllegalPass) as e:
-#         game_ready_to_pass.pass_cards(source="c", destination="a", cards=passed_cards)
-#     assert e.value.args[0] == f"Passes must be exactly 4 cards, not {num_cards_to_pass}"
-#
-#
-#
-#
-#
-# # Support passing between other winning bidders
-# # Make sure the pass is a legal pass
-# #  - Then from winner to partner
-# #  - Exactly four cards
-#
+@pytest.mark.parametrize("num_cards_to_pass", [0, 1, 2, 3, 5, 6])
+def test_pass_must_be_exactly_four_cards(passing_cards_state, num_cards_to_pass) -> None:
+    passed_cards = passing_cards_state.partner_hand[:num_cards_to_pass]
+    with pytest.raises(IllegalPass) as e:
+        passing_cards_state.pass_cards(source=partner(), destination=bid_winner(), cards=passed_cards)
+    assert e.value.args[0] == f"Passes must be exactly 4 cards, not {num_cards_to_pass}"
+
+
+
+
+
+# Support passing between other winning bidders
+# Make sure the pass is a legal pass
+#  - Then from winner to partner
+#  - Exactly four cards
+
