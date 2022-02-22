@@ -33,6 +33,21 @@ class PinochleGame(NamedTuple):
     def pass_cards(
         self, source: str, destination: str, cards: Tuple[Card, Card, Card, Card]
     ) -> "PinochleGame":
-        new_hand = self.hands[0] + cards
-        new_hands = (new_hand, self.hands[1], self.hands[2], self.hands[3])
+        new_hand_0 = self.hands[0] + cards
+        new_hand_2 = self._remove_cards_from_hand(
+            initial_hand=self.hands[2], cards_to_remove=cards
+        )
+        new_hands = (new_hand_0, self.hands[1], new_hand_2, self.hands[3])
         return self._replace(hands=new_hands)
+
+    @classmethod
+    def _remove_cards_from_hand(
+        cls, initial_hand: Tuple[Card, ...], cards_to_remove: Tuple[Card, ...]
+    ) -> Tuple[Card, ...]:
+        if not cards_to_remove:
+            return initial_hand
+        index_to_remove = initial_hand.index(cards_to_remove[0])
+        new_hand = initial_hand[:index_to_remove] + initial_hand[index_to_remove + 1 :]
+        return cls._remove_cards_from_hand(
+            initial_hand=new_hand, cards_to_remove=cards_to_remove[1:]
+        )

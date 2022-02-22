@@ -46,6 +46,16 @@ def game_ready_to_pass(players: Tuple[str, str, str, str]) -> PinochleGame:
     )
 
 
+@pytest.fixture(scope="session")
+def passed_cards() -> Tuple[Card, Card, Card, Card]:
+    return (
+        Card(Rank.ACE, Suit.HEARTS),
+        Card(Rank.ACE, Suit.HEARTS),
+        Card(Rank.KING, Suit.HEARTS),
+        Card(Rank.QUEEN, Suit.HEARTS),
+    )
+
+
 def test_new_game_state_is_bidding(new_game) -> None:
     assert new_game.state == GameState.BIDDING
     assert new_game.bidding is not None
@@ -75,17 +85,12 @@ def test_set_trump_advances_state_to_passing(
 
 
 def test_pass_to_winner_creates_correct_winner_hand(
-    game_ready_to_pass: PinochleGame,
+    game_ready_to_pass: PinochleGame, passed_cards: Tuple[Card, Card, Card, Card]
 ) -> None:
-    passed_cards = (
-        Card(Rank.ACE, Suit.HEARTS),
-        Card(Rank.ACE, Suit.HEARTS),
-        Card(Rank.KING, Suit.HEARTS),
-        Card(Rank.QUEEN, Suit.HEARTS),
-    )
     game = game_ready_to_pass.pass_cards(
         source="c", destination="a", cards=passed_cards
     )
+
     assert sorted(game.hands[0]) == sorted(
         tuple(Card(rank, Suit.CLUBS) for rank in Rank) * 2
         + (
@@ -93,5 +98,26 @@ def test_pass_to_winner_creates_correct_winner_hand(
             Card(Rank.ACE, Suit.HEARTS),
             Card(Rank.KING, Suit.HEARTS),
             Card(Rank.QUEEN, Suit.HEARTS),
+        )
+    )
+
+
+def test_pass_to_winner_creates_correct_partner_hand(
+    game_ready_to_pass: PinochleGame, passed_cards: Tuple[Card, Card, Card, Card]
+) -> None:
+    game = game_ready_to_pass.pass_cards(
+        source="c", destination="a", cards=passed_cards
+    )
+
+    assert sorted(game.hands[2]) == sorted(
+        (
+            Card(Rank.TEN, Suit.HEARTS),
+            Card(Rank.TEN, Suit.HEARTS),
+            Card(Rank.KING, Suit.HEARTS),
+            Card(Rank.QUEEN, Suit.HEARTS),
+            Card(Rank.JACK, Suit.HEARTS),
+            Card(Rank.JACK, Suit.HEARTS),
+            Card(Rank.NINE, Suit.HEARTS),
+            Card(Rank.NINE, Suit.HEARTS),
         )
     )
