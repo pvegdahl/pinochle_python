@@ -3,7 +3,7 @@ from typing import Tuple
 import pytest
 
 from cards import CardDeck, Card, Suit, Rank
-from passing_cards import PassingCards
+from passing_cards import PassingCards, IllegalPass
 
 
 def bid_winner() -> str:
@@ -25,7 +25,7 @@ def all_diamonds() -> Tuple[Card, ...]:
 
 
 @pytest.fixture(scope="session")
-def passing_cards(all_spades, all_diamonds) -> PassingCards:
+def passing_cards_state(all_spades, all_diamonds) -> PassingCards:
     # For simplicity, we're setting up the hands so that the winner has all spades, and the partner has all diamonds
     return PassingCards(bid_winner=bid_winner(), partner=partner(), bid_winner_hand=all_spades, partner_hand=all_diamonds)
 
@@ -40,8 +40,8 @@ def partner_passed_cards() -> Tuple[Card, Card, Card, Card]:
     )
 
 
-def test_pass_to_winner_creates_correct_winner_hand(passing_cards, partner_passed_cards, all_spades) -> None:
-    updated = passing_cards.pass_cards(source=partner(), destination=bid_winner(), cards=partner_passed_cards)
+def test_pass_to_winner_creates_correct_winner_hand(passing_cards_state, partner_passed_cards, all_spades) -> None:
+    updated = passing_cards_state.pass_cards(source=partner(), destination=bid_winner(), cards=partner_passed_cards)
 
     assert sorted(updated.bid_winner_hand) == sorted(
         all_spades
@@ -54,8 +54,8 @@ def test_pass_to_winner_creates_correct_winner_hand(passing_cards, partner_passe
     )
 
 
-def test_pass_to_winner_creates_correct_partner_hand(passing_cards, partner_passed_cards) -> None:
-    updated = passing_cards.pass_cards(source=partner(), destination=bid_winner(), cards=partner_passed_cards)
+def test_pass_to_winner_creates_correct_partner_hand(passing_cards_state, partner_passed_cards) -> None:
+    updated = passing_cards_state.pass_cards(source=partner(), destination=bid_winner(), cards=partner_passed_cards)
 
     assert sorted(updated.partner_hand) == sorted(
         (
@@ -71,47 +71,33 @@ def test_pass_to_winner_creates_correct_partner_hand(passing_cards, partner_pass
     )
 
 
-# def test_must_have_passed_cards(
-#         game_ready_to_pass: PinochleGame
-# ) -> None:
-#     passed_cards = (
-#         Card(Rank.ACE, Suit.HEARTS),
-#         Card(Rank.ACE, Suit.HEARTS),
-#         Card(Rank.JACK, Suit.DIAMONDS),
-#         Card(Rank.QUEEN, Suit.SPADES),
-#     )
-#
-#     with pytest.raises(IllegalPass) as e:
-#         game_ready_to_pass.pass_cards(
-#             source="c", destination="a", cards=passed_cards
-#         )
-#     assert e.value.args[0] == "Jack of Diamonds is not in hand to pass"
-#
-#
-# @pytest.mark.parametrize("source, destination, suit_to_pass", [
-#     ("a", "a", Suit.CLUBS),
-#     ("a", "b", Suit.CLUBS),
-#     ("a", "c", Suit.CLUBS),
-#     ("a", "d", Suit.CLUBS),
-#     ("b", "a", Suit.DIAMONDS),
-#     ("b", "b", Suit.DIAMONDS),
-#     ("b", "c", Suit.DIAMONDS),
-#     ("b", "d", Suit.DIAMONDS),
-#     ("c", "b", Suit.HEARTS),
-#     ("c", "c", Suit.HEARTS),
-#     ("c", "d", Suit.HEARTS),
-#     ("d", "a", Suit.SPADES),
-#     ("d", "b", Suit.SPADES),
-#     ("d", "c", Suit.SPADES),
-#     ("d", "d", Suit.SPADES),
-# ])
-# def test_initial_pass_must_be_from_partner_to_winner(source, destination, suit_to_pass, game_ready_to_pass: PinochleGame) -> None:
-#     cards_to_pass = (Card(Rank.ACE, suit_to_pass), Card(Rank.TEN, suit_to_pass)) * 2
-#     with pytest.raises(IllegalPass) as e:
-#         game_ready_to_pass.pass_cards(source=source, destination=destination, cards=cards_to_pass)
-#     assert e.value.args[0] == "The only legal pass is from c to a"
-#
-#
+def test_passee_must_have_passed_cards(passing_cards_state) -> None:
+    passed_cards = (
+        Card(Rank.ACE, Suit.DIAMONDS),
+        Card(Rank.ACE, Suit.DIAMONDS),
+        Card(Rank.JACK, Suit.HEARTS),
+        Card(Rank.QUEEN, Suit.SPADES),
+    )
+
+    with pytest.raises(IllegalPass) as e:
+        passing_cards_state.pass_cards(source=partner(), destination=bid_winner(), cards=passed_cards)
+    assert e.value.args[0] == "Jack of Hearts is not in hand to pass"
+
+
+@pytest.mark.parametrize("source, destination", [
+    (bid_winner(), partner()),
+    (bid_winner(), bid_winner()),
+    (partner(), partner()),
+    (partner(), "other"),
+    ("other", bid_winner()),
+])
+def test_initial_pass_must_be_from_partner_to_winner(source, destination, passing_cards_state):
+    cards_to_pass = (Card(Rank.ACE, Suit.DIAMONDS), Card(Rank.JACK, Suit.DIAMONDS)) * 2
+    with pytest.raises(IllegalPass) as e:
+        passing_cards_state.pass_cards(source=source, destination=destination, cards=cards_to_pass)
+    assert e.value.args[0] == "The only legal pass is from c to a"
+
+
 # def test_no_pass_legal_before_passing_phase(game_bidding_complete: PinochleGame, passed_cards) -> None:
 #     with pytest.raises(IllegalPass) as e:
 #         game_bidding_complete.pass_cards(source="c", destination="a", cards=passed_cards)

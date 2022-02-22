@@ -16,10 +16,14 @@ class PassingCards(NamedTuple):
     def pass_cards(
             self, source: str, destination: str, cards: Tuple[Card, Card, Card, Card]
     ) -> "PassingCards":
-        # self._validate_legality_of_pass(source=source, destination=destination, cards=cards)
+        self._validate_legality_of_pass(source=source, destination=destination, cards=cards)
         new_winner_hand = self.bid_winner_hand + cards
         new_partner_card = self._remove_cards_from_hand(initial_hand=self.partner_hand, cards_to_remove=cards)
         return self._replace(bid_winner_hand=new_winner_hand, partner_hand=new_partner_card)
+
+    def _validate_legality_of_pass(self, source: str, destination: str, cards: Tuple[Card, Card, Card, Card]):
+        if source != self.partner or destination != self.bid_winner:
+            raise IllegalPass(f"The only legal pass is from {self.partner} to {self.bid_winner}")
 
     @classmethod
     def _remove_cards_from_hand(
