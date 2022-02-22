@@ -37,12 +37,26 @@ class PinochleGame(NamedTuple):
     def pass_cards(
         self, source: str, destination: str, cards: Tuple[Card, Card, Card, Card]
     ) -> "PinochleGame":
+        self._validate_passing_is_between_correct_players(source=source, destination=destination)
+
         new_hand_0 = self.hands[0] + cards
         new_hand_2 = self._remove_cards_from_hand(
             initial_hand=self.hands[2], cards_to_remove=cards
         )
         new_hands = (new_hand_0, self.hands[1], new_hand_2, self.hands[3])
         return self._replace(hands=new_hands)
+
+    def _validate_passing_is_between_correct_players(self, source: str, destination):
+        if source != "c" or destination != "a":
+            raise IllegalPass(f"The only legal pass is from {self._get_bid_winner_partner()} to {self._get_bid_winner()}")
+
+    def _get_bid_winner(self) -> str:
+        return self.bidding.get_winner()
+
+    def _get_bid_winner_partner(self) -> str:
+        bid_winner_index = self.players.index(self._get_bid_winner())
+        partner_index = (bid_winner_index + 2) % 4
+        return self.players[partner_index]
 
     @classmethod
     def _remove_cards_from_hand(

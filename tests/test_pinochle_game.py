@@ -138,3 +138,38 @@ def test_must_have_passed_cards(
             source="c", destination="a", cards=passed_cards
         )
     assert e.value.args[0] == "Jack of Diamonds is not in hand to pass"
+
+
+@pytest.mark.parametrize("source, destination, suit_to_pass", [
+    ("a", "a", Suit.CLUBS),
+    ("a", "b", Suit.CLUBS),
+    ("a", "c", Suit.CLUBS),
+    ("a", "d", Suit.CLUBS),
+    ("b", "a", Suit.DIAMONDS),
+    ("b", "b", Suit.DIAMONDS),
+    ("b", "c", Suit.DIAMONDS),
+    ("b", "d", Suit.DIAMONDS),
+    ("c", "b", Suit.HEARTS),
+    ("c", "c", Suit.HEARTS),
+    ("c", "d", Suit.HEARTS),
+    ("d", "a", Suit.SPADES),
+    ("d", "b", Suit.SPADES),
+    ("d", "c", Suit.SPADES),
+    ("d", "d", Suit.SPADES),
+])
+def test_initial_pass_must_be_from_partner_to_winner(source, destination, suit_to_pass, game_ready_to_pass: PinochleGame) -> None:
+    cards_to_pass = (Card(Rank.ACE, suit_to_pass), Card(Rank.TEN, suit_to_pass)) * 2
+    with pytest.raises(IllegalPass) as e:
+        game_ready_to_pass.pass_cards(source=source, destination=destination, cards=cards_to_pass)
+    assert e.value.args[0] == "The only legal pass is from c to a"
+
+
+
+
+# Support passing between other players
+# Make sure the pass is a legal pass
+#  - In the correct stage of game
+#  - From partner to winner
+#  - Then from winner to partner
+#  - Exactly four cards
+
