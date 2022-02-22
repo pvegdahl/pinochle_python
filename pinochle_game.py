@@ -10,6 +10,10 @@ class GameState(Enum):
     PASSING_TO_BID_WINNER = "PassingToBidWinner"
 
 
+class IllegalPass(Exception):
+    pass
+
+
 class PinochleGame(NamedTuple):
     state: GameState
     players: Tuple[str, str, str, str]
@@ -46,8 +50,12 @@ class PinochleGame(NamedTuple):
     ) -> Tuple[Card, ...]:
         if not cards_to_remove:
             return initial_hand
-        index_to_remove = initial_hand.index(cards_to_remove[0])
-        new_hand = initial_hand[:index_to_remove] + initial_hand[index_to_remove + 1 :]
+        try:
+            index_to_remove = initial_hand.index(cards_to_remove[0])
+        except ValueError as e:
+            raise IllegalPass(f"{cards_to_remove[0]} is not in hand to pass")
+
+        new_hand = initial_hand[:index_to_remove] + initial_hand[index_to_remove + 1:]
         return cls._remove_cards_from_hand(
             initial_hand=new_hand, cards_to_remove=cards_to_remove[1:]
         )

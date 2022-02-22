@@ -4,7 +4,7 @@ import pytest
 
 from bidding import BiddingState
 from cards import CardDeck, Suit, Card, Rank
-from pinochle_game import PinochleGame, GameState
+from pinochle_game import PinochleGame, GameState, IllegalPass
 
 
 @pytest.fixture(scope="session")
@@ -121,3 +121,20 @@ def test_pass_to_winner_creates_correct_partner_hand(
             Card(Rank.NINE, Suit.HEARTS),
         )
     )
+
+
+def test_must_have_passed_cards(
+        game_ready_to_pass: PinochleGame
+) -> None:
+    passed_cards = (
+        Card(Rank.ACE, Suit.HEARTS),
+        Card(Rank.ACE, Suit.HEARTS),
+        Card(Rank.JACK, Suit.DIAMONDS),
+        Card(Rank.QUEEN, Suit.SPADES),
+    )
+
+    with pytest.raises(IllegalPass) as e:
+        game_ready_to_pass.pass_cards(
+            source="c", destination="a", cards=passed_cards
+        )
+    assert e.value.args[0] == "Jack of Diamonds is not in hand to pass"

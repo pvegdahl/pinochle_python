@@ -16,6 +16,9 @@ class Suit(Enum):
         order = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES]
         return order.index(self) < order.index(other)
 
+    def __str__(self):
+        return self.value
+
 
 @functools.total_ordering
 class Rank(Enum):
@@ -30,6 +33,9 @@ class Rank(Enum):
         order = [Rank.NINE, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.TEN, Rank.ACE]
         return order.index(self) < order.index(other)
 
+    def __str__(self):
+        return self.value
+
 
 @functools.total_ordering
 @dataclass(frozen=True)
@@ -41,6 +47,9 @@ class Card:
         if self.suit == other.suit:
             return self.rank < other.rank
         return self.suit < other.suit
+
+    def __str__(self):
+        return f"{self.rank} of {self.suit}"
 
 
 class CardDeck:
