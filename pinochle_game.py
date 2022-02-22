@@ -9,6 +9,9 @@ class GameState(Enum):
     BIDDING = "Bidding"
     PASSING_TO_BID_WINNER = "PassingToBidWinner"
 
+    def __str__(self):
+        return self.value
+
 
 class IllegalPass(Exception):
     pass
@@ -37,7 +40,7 @@ class PinochleGame(NamedTuple):
     def pass_cards(
         self, source: str, destination: str, cards: Tuple[Card, Card, Card, Card]
     ) -> "PinochleGame":
-        self._validate_passing_is_between_correct_players(source=source, destination=destination)
+        self._validate_legality_of_pass(source=source, destination=destination, cards=cards)
 
         new_hand_0 = self.hands[0] + cards
         new_hand_2 = self._remove_cards_from_hand(
@@ -46,7 +49,12 @@ class PinochleGame(NamedTuple):
         new_hands = (new_hand_0, self.hands[1], new_hand_2, self.hands[3])
         return self._replace(hands=new_hands)
 
-    def _validate_passing_is_between_correct_players(self, source: str, destination):
+    def _validate_legality_of_pass(self, source: str, destination: str, cards: Tuple[Card, Card, Card, Card]):
+        if len(cards) != 4:
+            raise IllegalPass(f"Passes must be exactly 4 cards, not {len(cards)}")
+        if self.state != GameState.PASSING_TO_BID_WINNER:
+            raise IllegalPass(f"You cannot pass cards in the {self.state} phase")
+
         if source != "c" or destination != "a":
             raise IllegalPass(f"The only legal pass is from {self._get_bid_winner_partner()} to {self._get_bid_winner()}")
 
