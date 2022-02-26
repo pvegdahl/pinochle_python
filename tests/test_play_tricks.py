@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, NamedTuple
 
 import pytest
 
@@ -7,25 +7,38 @@ from play_tricks import PlayTricksState, InvalidPlay
 
 
 @pytest.fixture(scope="session")
-def start_of_play(sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
-    return PlayTricksState(hands=sorted_hands, next_player="a")
+def start_of_play_a(players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+    return PlayTricksState(hands=sorted_hands, players=players, next_player="a")
+
+
+@pytest.fixture(scope="session")
+def players() -> Tuple[str, str, str, str]:
+    return "a", "b", "c", "d"
+
+
+@pytest.fixture(scope="session", params=["a", "b", "c", "d"])
+def start_of_play(request, players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+    return PlayTricksState(hands=sorted_hands, players=players, next_player=request.param)
 
 
 def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> None:
-    play_state = start_of_play.play_card(player="a", card=Card(Rank.ACE, Suit.CLUBS))
-    assert sorted(play_state.hands[0]) == sorted(
+    player = start_of_play.next_player
+    player_index = start_of_play.players.index(player)
+    player_suit = start_of_play.hands[player_index][0].suit
+    play_state = start_of_play.play_card(player=start_of_play.next_player, card=Card(Rank.ACE, Suit.CLUBS))
+    assert sorted(play_state.hands[player_index]) == sorted(
         (
-            Card(Rank.ACE, Suit.CLUBS),
-            Card(Rank.TEN, Suit.CLUBS),
-            Card(Rank.TEN, Suit.CLUBS),
-            Card(Rank.KING, Suit.CLUBS),
-            Card(Rank.KING, Suit.CLUBS),
-            Card(Rank.QUEEN, Suit.CLUBS),
-            Card(Rank.QUEEN, Suit.CLUBS),
-            Card(Rank.JACK, Suit.CLUBS),
-            Card(Rank.JACK, Suit.CLUBS),
-            Card(Rank.NINE, Suit.CLUBS),
-            Card(Rank.NINE, Suit.CLUBS),
+            Card(Rank.ACE, player_suit),
+            Card(Rank.TEN, player_suit),
+            Card(Rank.TEN, player_suit),
+            Card(Rank.KING, player_suit),
+            Card(Rank.KING, player_suit),
+            Card(Rank.QUEEN, player_suit),
+            Card(Rank.QUEEN, player_suit),
+            Card(Rank.JACK, player_suit),
+            Card(Rank.JACK, player_suit),
+            Card(Rank.NINE, player_suit),
+            Card(Rank.NINE, player_suit),
         )
     )
 
@@ -38,15 +51,20 @@ def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> Non
         ("d", Card(Rank.ACE, Suit.SPADES)),
     ],
 )
-def test_cannot_play_out_of_turn(player: str, card: Card, start_of_play: PlayTricksState) -> None:
+def test_cannot_play_out_of_turn(player: str, card: Card, start_of_play_a: PlayTricksState) -> None:
     with pytest.raises(InvalidPlay) as e:
-        start_of_play.play_card(player=player, card=card)
+        start_of_play_a.play_card(player=player, card=card)
     assert e.value.args[0] == f"{player} cannot play on a's turn"
 
 
+def test_cannot_play_card_not_in_hand(start_of_play_a: PlayTricksState) -> None:
+    with pytest.raises(InvalidPlay) as e:
+        start_of_play_a.play_card(player="a", card=Card(Rank.JACK, Suit.DIAMONDS))
+    assert e.value.args[0] == "a does not have a Jack of Diamonds in hand"
+
+
 # TODO
-#  - Is it their turn?
-#  - Check that the player has the card
+#  - Card removal works for any player
 #  - Check that the played card is valid
 #    + Matches suit if possible
 #    + Trump if not possible to match suit
