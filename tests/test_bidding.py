@@ -3,6 +3,7 @@ from typing import Tuple
 import pytest
 
 from bidding import BiddingState, InvalidBid
+from cards import Suit
 
 
 @pytest.fixture(scope="session")
@@ -133,4 +134,32 @@ def test_no_winning_bidder_with_multiple_players_left(
     assert bidding_state.get_winner() is None
 
 
-# Winning bidder is the last one standing
+@pytest.mark.parametrize("trump", [suit for suit in Suit])
+def test_set_trump_does_what_it_says(bidding_state_with_single_remaining_player: BiddingState, trump: Suit):
+    winning_bidder = bidding_state_with_single_remaining_player.get_winner()
+    bidding_state = bidding_state_with_single_remaining_player.set_trump(player=winning_bidder, trump=trump)
+    assert bidding_state.trump == trump
+
+
+@pytest.mark.parametrize("player", ["a", "b", "c", "d"])
+def test_cannot_set_trump_while_bidding_still_in_progress(player: str, bidding_state: BiddingState) -> None:
+    with pytest.raises(InvalidBid) as e:
+        bidding_state.set_trump(player=player, trump=Suit.SPADES)
+    assert e.value.args[0] == "Cannot set trump while bidding is still in progress"
+
+
+@pytest.mark.parametrize("player", ["alice", "bob", "charlie"])
+def test_set_trump_only_available_to_bid_winner(
+    player: str, bidding_state_with_single_remaining_player: BiddingState
+) -> None:
+    with pytest.raises(InvalidBid) as e:
+        bidding_state_with_single_remaining_player.set_trump(player=player, trump=Suit.SPADES)
+    assert e.value.args[0] == f"{player} cannot set trump, bid_winner won the bid"
+
+
+def test_cannot_set_trump_if_trump_already_set(bidding_state_with_single_remaining_player: BiddingState):
+    winning_bidder = bidding_state_with_single_remaining_player.get_winner()
+    bidding_state = bidding_state_with_single_remaining_player.set_trump(player=winning_bidder, trump=Suit.HEARTS)
+    with pytest.raises(InvalidBid) as e:
+        bidding_state.set_trump(player=winning_bidder, trump=Suit.CLUBS)
+    assert e.value.args[0] == "Trump has already been set"

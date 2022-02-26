@@ -1,5 +1,7 @@
 from typing import NamedTuple, Tuple, Optional
 
+from cards import Suit
+
 
 class InvalidBid(Exception):
     pass
@@ -9,6 +11,7 @@ class BiddingState(NamedTuple):
     current_bid: int
     active_players: Tuple[str, ...]
     current_player_index: int = 0
+    trump: Suit = None
 
     def new_bid(self, bid: int, player: str) -> "BiddingState":
         self._validate_bid(bid, player)
@@ -50,3 +53,12 @@ class BiddingState(NamedTuple):
         if len(self.active_players) == 1:
             return self.active_players[0]
         return None
+
+    def set_trump(self, player: str, trump: Suit) -> "BiddingState":
+        if self.get_winner() is None:
+            raise InvalidBid("Cannot set trump while bidding is still in progress")
+        elif player != self.get_winner():
+            raise InvalidBid(f"{player} cannot set trump, {self.get_winner()} won the bid")
+        elif self.trump is not None:
+            raise InvalidBid("Trump has already been set")
+        return self._replace(trump=trump)
