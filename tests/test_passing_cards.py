@@ -4,6 +4,7 @@ import pytest
 
 from cards import Card, Suit, Rank
 from passing_cards import PassingCards, IllegalPass
+from utils import InvalidCardRemoval
 
 
 def bid_winner() -> str:
@@ -12,16 +13,6 @@ def bid_winner() -> str:
 
 def partner() -> str:
     return "partner"
-
-
-@pytest.fixture(scope="session")
-def all_spades() -> Tuple[Card, ...]:
-    return tuple(Card(rank, Suit.SPADES) for rank in Rank) * 2
-
-
-@pytest.fixture(scope="session")
-def all_diamonds() -> Tuple[Card, ...]:
-    return tuple(Card(rank, Suit.DIAMONDS) for rank in Rank) * 2
 
 
 @pytest.fixture(scope="session")
@@ -92,9 +83,9 @@ def test_passee_must_have_passed_cards(passing_cards_state) -> None:
         Card(Rank.QUEEN, Suit.SPADES),
     )
 
-    with pytest.raises(IllegalPass) as e:
+    with pytest.raises(InvalidCardRemoval) as e:
         passing_cards_state.pass_cards(source=partner(), destination=bid_winner(), cards=passed_cards)
-    assert e.value.args[0] == "Jack of Hearts is not in hand to pass"
+    assert e.value.args[0] == "Jack of Hearts is not in hand"
 
 
 @pytest.mark.parametrize(
