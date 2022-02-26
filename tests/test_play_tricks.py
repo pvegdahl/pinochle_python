@@ -3,12 +3,12 @@ from typing import Tuple
 import pytest
 
 from cards import Card, Suit, Rank
-from play_tricks import PlayTricksState
+from play_tricks import PlayTricksState, InvalidPlay
 
 
 @pytest.fixture(scope="session")
 def start_of_play(sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
-    return PlayTricksState(hands=sorted_hands)
+    return PlayTricksState(hands=sorted_hands, next_player="a")
 
 
 def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> None:
@@ -28,6 +28,20 @@ def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> Non
             Card(Rank.NINE, Suit.CLUBS),
         )
     )
+
+
+@pytest.mark.parametrize(
+    "player, card",
+    [
+        ("b", Card(Rank.ACE, Suit.DIAMONDS)),
+        ("c", Card(Rank.ACE, Suit.HEARTS)),
+        ("d", Card(Rank.ACE, Suit.SPADES)),
+    ],
+)
+def test_cannot_play_out_of_turn(player: str, card: Card, start_of_play: PlayTricksState) -> None:
+    with pytest.raises(InvalidPlay) as e:
+        start_of_play.play_card(player=player, card=card)
+    assert e.value.args[0] == f"{player} cannot play on a's turn"
 
 
 # TODO
