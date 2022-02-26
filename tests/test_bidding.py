@@ -48,9 +48,7 @@ def test_reject_bids_with_only_one_player_left(
 def test_update_current_bidder(bidding_state: BiddingState) -> None:
     for expected_bidder in ["a", "b", "c", "d", "a"]:
         assert bidding_state.current_player() == expected_bidder
-        bidding_state = bidding_state.new_bid(
-            bid=bidding_state.current_bid + 1, player=bidding_state.current_player()
-        )
+        bidding_state = bidding_state.new_bid(bid=bidding_state.current_bid + 1, player=bidding_state.current_player())
 
 
 def test_reject_bids_by_wrong_player(bidding_state: BiddingState) -> None:
@@ -71,16 +69,12 @@ def test_reject_bids_by_wrong_player(bidding_state: BiddingState) -> None:
 def test_player_can_pass_and_is_removed_from_bidding(
     active_player: str, expected: Tuple[str, ...], players: Tuple[str, ...]
 ) -> None:
-    bidding_state = _create_bidding_state_with_active_player(
-        active_player=active_player, players=players
-    )
+    bidding_state = _create_bidding_state_with_active_player(active_player=active_player, players=players)
     bidding_state = bidding_state.pass_bidding(active_player)
     assert bidding_state.active_players == expected
 
 
-def _create_bidding_state_with_active_player(
-    active_player: str, players: Tuple[str, ...]
-) -> BiddingState:
+def _create_bidding_state_with_active_player(active_player: str, players: Tuple[str, ...]) -> BiddingState:
     return BiddingState(
         current_bid=25,
         active_players=players,
@@ -104,23 +98,14 @@ def test_only_current_bidder_can_pass(player: str, bidding_state: BiddingState) 
         ("d", "a"),
     ],
 )
-def test_passing_moves_to_correct_next_player(
-    active_player: str, expected: str, players: Tuple[str, ...]
-) -> None:
-    bidding_state = _create_bidding_state_with_active_player(
-        active_player=active_player, players=players
-    )
+def test_passing_moves_to_correct_next_player(active_player: str, expected: str, players: Tuple[str, ...]) -> None:
+    bidding_state = _create_bidding_state_with_active_player(active_player=active_player, players=players)
     bidding_state = bidding_state.pass_bidding(active_player)
     assert bidding_state.current_player() == expected
 
 
 def test_bidding_rotation_as_players_are_passing(bidding_state: BiddingState) -> None:
-    bidding_state = (
-        bidding_state.pass_bidding("a")
-        .new_bid(26, "b")
-        .new_bid(27, "c")
-        .new_bid(28, "d")
-    )
+    bidding_state = bidding_state.pass_bidding("a").new_bid(26, "b").new_bid(27, "c").new_bid(28, "d")
     assert bidding_state.current_player() == "b"
     bidding_state = bidding_state.new_bid(29, "b").new_bid(30, "c").pass_bidding("d")
     assert bidding_state.current_player() == "b"

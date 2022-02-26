@@ -25,9 +25,7 @@ class TestScoreMeld:
         assert score_meld(hand=[Card(Rank.NINE, Suit.HEARTS)], trump=Suit.HEARTS) == 1
 
     def test_2x_nine_of_trump(self):
-        assert (
-            score_meld(hand=[Card(Rank.NINE, Suit.HEARTS)] * 2, trump=Suit.HEARTS) == 2
-        )
+        assert score_meld(hand=[Card(Rank.NINE, Suit.HEARTS)] * 2, trump=Suit.HEARTS) == 2
 
     def test_one_marriage(self):
         hand = [
@@ -136,15 +134,10 @@ class TestScoreMeld:
         assert score_meld(hand=hand, trump=Suit.HEARTS) == 0
 
     def test_five_cards_in_trump_is_not_a_run(self):
-        assert (
-            score_meld(hand=([Card(Rank.ACE, Suit.HEARTS)] * 5), trump=Suit.HEARTS) == 0
-        )
+        assert score_meld(hand=([Card(Rank.ACE, Suit.HEARTS)] * 5), trump=Suit.HEARTS) == 0
 
     def test_double_run_in_trump(self):
-        assert (
-            score_meld(hand=(self._create_run(Suit.HEARTS) * 2), trump=Suit.HEARTS)
-            == 150
-        )
+        assert score_meld(hand=(self._create_run(Suit.HEARTS) * 2), trump=Suit.HEARTS) == 150
 
     @staticmethod
     def _create_run(suit: Suit) -> List[Card]:

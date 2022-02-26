@@ -13,26 +13,20 @@ class BiddingState(NamedTuple):
     def new_bid(self, bid: int, player: str) -> "BiddingState":
         self._validate_bid(bid, player)
 
-        return self._replace(
-            current_bid=bid, current_player_index=self._get_next_bidder_index()
-        )
+        return self._replace(current_bid=bid, current_player_index=self._get_next_bidder_index())
 
     def _validate_bid(self, bid, player):
         self._validate_player_can_bid(player=player)
 
         if bid <= self.current_bid:
-            raise InvalidBid(
-                f"New bid of {bid} did not exceed the current bid of {self.current_bid}"
-            )
+            raise InvalidBid(f"New bid of {bid} did not exceed the current bid of {self.current_bid}")
 
     def _validate_player_can_bid(self, player: str) -> None:
         if len(self.active_players) == 1:
             raise InvalidBid("Bidding is over")
 
         if player != self.current_player():
-            raise InvalidBid(
-                f"{player} cannot take actions on {self.current_player()}'s turn"
-            )
+            raise InvalidBid(f"{player} cannot take actions on {self.current_player()}'s turn")
 
     def _get_next_bidder_index(self):
         return (self.current_player_index + 1) % len(self.active_players)

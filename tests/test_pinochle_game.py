@@ -70,9 +70,7 @@ def test_no_trump_at_start(new_game) -> None:
 
 
 @pytest.mark.parametrize("trump_suit", [suit for suit in Suit])
-def test_set_trump_does_what_it_says(
-    trump_suit: Suit, game_bidding_complete: PinochleGame
-) -> None:
+def test_set_trump_does_what_it_says(trump_suit: Suit, game_bidding_complete: PinochleGame) -> None:
     game = game_bidding_complete.select_trump(player="a", trump=trump_suit)
     assert game.trump == trump_suit
 
