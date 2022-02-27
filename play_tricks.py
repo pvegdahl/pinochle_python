@@ -23,7 +23,12 @@ class PlayTricksState(NamedTuple):
         except InvalidCardRemoval as e:
             raise InvalidPlay(f"{player} does not have a {card} in hand") from e
 
-        return self._replace(hands=new_hands)
+        new_next_player = self._next_next_player()
+        return self._replace(hands=new_hands, next_player=new_next_player)
 
     def _next_player_index(self) -> int:
         return self.players.index(self.next_player)
+
+    def _next_next_player(self) -> str:
+        index = (self._next_player_index() + 1) % 4
+        return self.players[index]

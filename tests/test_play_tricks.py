@@ -24,11 +24,9 @@ def start_of_play(
 
 
 def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> None:
-    player = start_of_play.next_player
-    player_index = start_of_play.players.index(player)
-    player_suit = start_of_play.hands[player_index][0].suit
+    player_suit = _get_player_suit(start_of_play)
     play_state = start_of_play.play_card(player=start_of_play.next_player, card=Card(Rank.ACE, player_suit))
-    assert sorted(play_state.hands[player_index]) == sorted(
+    assert sorted(play_state.hands[_get_player_index(start_of_play)]) == sorted(
         (
             Card(Rank.ACE, player_suit),
             Card(Rank.TEN, player_suit),
@@ -43,6 +41,14 @@ def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> Non
             Card(Rank.NINE, player_suit),
         )
     )
+
+
+def _get_player_index(play_state: PlayTricksState) -> int:
+    return play_state.players.index(play_state.next_player)
+
+
+def _get_player_suit(play_state: PlayTricksState) -> Suit:
+    return play_state.hands[_get_player_index(play_state)][0].suit
 
 
 @pytest.mark.parametrize(
@@ -65,12 +71,20 @@ def test_cannot_play_card_not_in_hand(start_of_play_a: PlayTricksState) -> None:
     assert e.value.args[0] == "a does not have a Jack of Diamonds in hand"
 
 
+def test_play_progresses_to_next_player(start_of_play: PlayTricksState) -> None:
+    play_state = start_of_play.play_card(player=start_of_play.next_player, card=Card(Rank.NINE, _get_player_suit(start_of_play)))
+    assert play_state.next_player == _get_next_player(start_of_play.next_player)
+
+
+def _get_next_player(player: str) -> str:
+    return {"a": "b", "b": "c", "c": "d", "d": "a"}[player]
+
 # TODO
+#  - Progress play to next player
 #  - Check that the played card is valid
 #    + Matches suit if possible
 #    + Trump if not possible to match suit
 #    + Higher than current winner if possible
-#  - Progress play to next player
 #  - When a trick is over:
 #    + Who won the trick?
 #    + In the event of a tie, the first player playing that card is the winner
