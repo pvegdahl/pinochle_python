@@ -11,24 +11,22 @@ class InvalidPlay(Exception):
 class PlayTricksState(NamedTuple):
     hands: Tuple[Tuple[Card, ...], ...]
     players: Tuple[str, str, str, str]
-    next_player: str
+    player_index: int
 
     def play_card(self, player: str, card: Card) -> "PlayTricksState":
-        if player != self.next_player:
-            raise InvalidPlay(f"{player} cannot play on {self.next_player}'s turn")
+        if player != self.current_player():
+            raise InvalidPlay(f"{player} cannot play on {self.current_player()}'s turn")
         try:
-            current_hand = self.hands[self._next_player_index()]
+            current_hand = self.hands[self.player_index]
             new_hand = remove_cards_from_hand(current_hand, (card,))
-            new_hands = self.hands[: self._next_player_index()] + (new_hand,) + self.hands[self._next_player_index() :]
+            new_hands = self.hands[: self.player_index] + (new_hand,) + self.hands[self.player_index :]
         except InvalidCardRemoval as e:
             raise InvalidPlay(f"{player} does not have a {card} in hand") from e
 
-        new_next_player = self._next_next_player()
-        return self._replace(hands=new_hands, next_player=new_next_player)
+        return self._replace(hands=new_hands, player_index=self._incremented_player_index())
 
-    def _next_player_index(self) -> int:
-        return self.players.index(self.next_player)
+    def current_player(self) -> str:
+        return self.players[self.player_index]
 
-    def _next_next_player(self) -> str:
-        index = (self._next_player_index() + 1) % 4
-        return self.players[index]
+    def _incremented_player_index(self) -> int:
+        return (self.player_index + 1) % 4

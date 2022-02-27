@@ -8,7 +8,7 @@ from play_tricks import PlayTricksState, InvalidPlay
 
 @pytest.fixture(scope="session")
 def start_of_play_a(players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
-    return PlayTricksState(hands=sorted_hands, players=players, next_player="a")
+    return PlayTricksState(hands=sorted_hands, players=players, player_index=0)
 
 
 @pytest.fixture(scope="session")
@@ -16,16 +16,16 @@ def players() -> Tuple[str, str, str, str]:
     return "a", "b", "c", "d"
 
 
-@pytest.fixture(scope="session", params=["a", "b", "c", "d"])
+@pytest.fixture(scope="session", params=range(4))
 def start_of_play(
     request, players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]
 ) -> PlayTricksState:
-    return PlayTricksState(hands=sorted_hands, players=players, next_player=request.param)
+    return PlayTricksState(hands=sorted_hands, players=players, player_index=request.param)
 
 
 def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> None:
     player_suit = _get_player_suit(start_of_play)
-    play_state = start_of_play.play_card(player=start_of_play.next_player, card=Card(Rank.ACE, player_suit))
+    play_state = start_of_play.play_card(player=start_of_play.current_player(), card=Card(Rank.ACE, player_suit))
     assert sorted(play_state.hands[_get_player_index(start_of_play)]) == sorted(
         (
             Card(Rank.ACE, player_suit),
@@ -44,7 +44,7 @@ def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> Non
 
 
 def _get_player_index(play_state: PlayTricksState) -> int:
-    return play_state.players.index(play_state.next_player)
+    return play_state.player_index
 
 
 def _get_player_suit(play_state: PlayTricksState) -> Suit:
@@ -72,12 +72,15 @@ def test_cannot_play_card_not_in_hand(start_of_play_a: PlayTricksState) -> None:
 
 
 def test_play_progresses_to_next_player(start_of_play: PlayTricksState) -> None:
-    play_state = start_of_play.play_card(player=start_of_play.next_player, card=Card(Rank.NINE, _get_player_suit(start_of_play)))
-    assert play_state.next_player == _get_next_player(start_of_play.next_player)
+    play_state = start_of_play.play_card(
+        player=start_of_play.current_player(), card=Card(Rank.NINE, _get_player_suit(start_of_play))
+    )
+    assert play_state.current_player() == _get_next_player(start_of_play.current_player())
 
 
 def _get_next_player(player: str) -> str:
     return {"a": "b", "b": "c", "c": "d", "d": "a"}[player]
+
 
 # TODO
 #  - Progress play to next player
