@@ -28,8 +28,8 @@ def middle_of_play(players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple
     hands = (
         (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
         (Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.ACE, Suit.DIAMONDS)),
-        (Card(Rank.KING, Suit.CLUBS), Card(Rank.ACE, Suit.HEARTS)),
-        (Card(Rank.TEN, Suit.CLUBS), Card(Rank.ACE, Suit.SPADES)),
+        (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.HEARTS)),
+        (Card(Rank.TEN, Suit.SPADES), Card(Rank.ACE, Suit.SPADES)),
     )
     return PlayTricksState(hands=hands, players=players, player_index=0)
 
@@ -93,24 +93,29 @@ def _get_next_player(player: str) -> str:
     return {"a": "b", "b": "c", "c": "d", "d": "a"}[player]
 
 
-def test_played_card_matches_suit_if_possible(middle_of_play: PlayTricksState) -> None:
+def test_valid_plays_do_not_raise_exception(middle_of_play: PlayTricksState) -> None:
     play_state = middle_of_play.play_card(player="a", card=Card(Rank.JACK, Suit.CLUBS))
 
-    # No exceptions thrown
+    # No exceptions thrown because...
+    # Matches suit and greater
     play_state = play_state.play_card(player="b", card=Card(Rank.QUEEN, Suit.CLUBS))
-    play_state = play_state.play_card(player="c", card=Card(Rank.KING, Suit.CLUBS))
-    play_state.play_card(player="d", card=Card(Rank.TEN, Suit.CLUBS))
+
+    # Matches suit and cannot be greater
+    play_state = play_state.play_card(player="c", card=Card(Rank.JACK, Suit.CLUBS))
+
+    # Cannot match suit so doesn't
+    play_state.play_card(player="d", card=Card(Rank.TEN, Suit.SPADES))
 
 
 def test_played_card_throws_exception_if_suit_not_matched(middle_of_play: PlayTricksState):
     play_state = middle_of_play.play_card(player="a", card=Card(Rank.JACK, Suit.CLUBS))
-    with pytest.raises(InvalidPlay):
+    with pytest.raises(InvalidPlay) as e:
         play_state.play_card(player="b", card=Card(Rank.ACE, Suit.DIAMONDS))
+    assert e.value.args[0] == "Must play on suit if possible"
 
 
 # TODO
 #  - Check that the played card is valid
-#    + Matches suit if possible
 #    + Trump if not possible to match suit
 #    + Higher than current winner if possible
 #  - When a trick is over:
