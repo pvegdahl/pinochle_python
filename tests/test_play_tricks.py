@@ -6,32 +6,28 @@ from cards import Card, Suit, Rank
 from play_tricks import PlayTricksState, InvalidPlay
 
 
-@pytest.fixture(scope="session")
-def start_of_play_a(players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
-    return PlayTricksState(hands=sorted_hands, players=players, player_index=0)
+PLAYERS = ("a", "b", "c", "d")
 
 
 @pytest.fixture(scope="session")
-def players() -> Tuple[str, str, str, str]:
-    return "a", "b", "c", "d"
+def start_of_play_a(sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+    return PlayTricksState(hands=sorted_hands, players=PLAYERS, player_index=0, trump=Suit.SPADES)
 
 
 @pytest.fixture(scope="session", params=range(4))
-def start_of_play(
-    request, players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]
-) -> PlayTricksState:
-    return PlayTricksState(hands=sorted_hands, players=players, player_index=request.param)
+def start_of_play(request, sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+    return PlayTricksState(hands=sorted_hands, players=PLAYERS, player_index=request.param, trump=Suit.SPADES)
 
 
 @pytest.fixture(scope="session")
-def middle_of_play(players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+def middle_of_play(sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
     hands = (
         (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
         (Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.ACE, Suit.DIAMONDS)),
         (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.HEARTS)),
         (Card(Rank.TEN, Suit.SPADES), Card(Rank.ACE, Suit.SPADES)),
     )
-    return PlayTricksState(hands=hands, players=players, player_index=0)
+    return PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.SPADES)
 
 
 def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> None:
@@ -109,9 +105,47 @@ def test_valid_plays_do_not_raise_exception(middle_of_play: PlayTricksState) -> 
 
 def test_played_card_throws_exception_if_suit_not_matched(middle_of_play: PlayTricksState):
     play_state = middle_of_play.play_card(player="a", card=Card(Rank.JACK, Suit.CLUBS))
+
+    # No exception
+    play_state.play_card(player="b", card=Card(Rank.QUEEN, Suit.CLUBS))
+
     with pytest.raises(InvalidPlay) as e:
         play_state.play_card(player="b", card=Card(Rank.ACE, Suit.DIAMONDS))
     assert e.value.args[0] == "Must play on suit if possible"
+
+
+def test_played_card_must_beat_trick_if_possible() -> None:
+    hands = (
+        (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.NINE, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+    )
+    play_state = PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.SPADES).play_card(
+        player="a", card=Card(Rank.JACK, Suit.CLUBS)
+    )
+
+    # No exception
+    play_state.play_card(player="b", card=Card(Rank.ACE, Suit.CLUBS))
+
+    with pytest.raises(InvalidPlay) as e:
+        play_state.play_card(player="b", card=Card(Rank.NINE, Suit.CLUBS))
+    assert e.value.args[0] == "Must beat current winning card if possible"
+
+
+def test_must_win_with_trump_if_cannot_match_suit() -> None:
+    hands = (
+        (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.NINE, Suit.SPADES), Card(Rank.ACE, Suit.HEARTS)),
+    )
+    play_state = PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.HEARTS).play_card(
+        "a", Card(Rank.ACE, Suit.CLUBS)
+    )
+
+    # No exception
+    play_state.play_card(player="b", card=Card(Rank.ACE, Suit.HEARTS))
+
+    with pytest.raises(InvalidPlay) as e:
+        play_state.play_card(player="b", card=Card(Rank.NINE, Suit.SPADES))
+    assert e.value.args[0] == "Must beat current winning card if possible"
 
 
 # TODO
