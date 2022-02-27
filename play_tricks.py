@@ -17,8 +17,13 @@ class PlayTricksState(NamedTuple):
         if player != self.next_player:
             raise InvalidPlay(f"{player} cannot play on {self.next_player}'s turn")
         try:
-            new_hands = (remove_cards_from_hand(self.hands[0], (card,)),) + self.hands[1:]
+            current_hand = self.hands[self._next_player_index()]
+            new_hand = remove_cards_from_hand(current_hand, (card,))
+            new_hands = self.hands[: self._next_player_index()] + (new_hand,) + self.hands[self._next_player_index() :]
         except InvalidCardRemoval as e:
             raise InvalidPlay(f"{player} does not have a {card} in hand") from e
 
         return self._replace(hands=new_hands)
+
+    def _next_player_index(self) -> int:
+        return self.players.index(self.next_player)

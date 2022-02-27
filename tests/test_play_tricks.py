@@ -17,7 +17,9 @@ def players() -> Tuple[str, str, str, str]:
 
 
 @pytest.fixture(scope="session", params=["a", "b", "c", "d"])
-def start_of_play(request, players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+def start_of_play(
+    request, players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]
+) -> PlayTricksState:
     return PlayTricksState(hands=sorted_hands, players=players, next_player=request.param)
 
 
@@ -25,7 +27,7 @@ def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> Non
     player = start_of_play.next_player
     player_index = start_of_play.players.index(player)
     player_suit = start_of_play.hands[player_index][0].suit
-    play_state = start_of_play.play_card(player=start_of_play.next_player, card=Card(Rank.ACE, Suit.CLUBS))
+    play_state = start_of_play.play_card(player=start_of_play.next_player, card=Card(Rank.ACE, player_suit))
     assert sorted(play_state.hands[player_index]) == sorted(
         (
             Card(Rank.ACE, player_suit),
@@ -64,7 +66,6 @@ def test_cannot_play_card_not_in_hand(start_of_play_a: PlayTricksState) -> None:
 
 
 # TODO
-#  - Card removal works for any player
 #  - Check that the played card is valid
 #    + Matches suit if possible
 #    + Trump if not possible to match suit
