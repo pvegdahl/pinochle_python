@@ -23,6 +23,17 @@ def start_of_play(
     return PlayTricksState(hands=sorted_hands, players=players, player_index=request.param)
 
 
+@pytest.fixture(scope="session")
+def middle_of_play(players: Tuple[str, str, str, str], sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+    hands = (
+        (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.ACE, Suit.DIAMONDS)),
+        (Card(Rank.KING, Suit.CLUBS), Card(Rank.ACE, Suit.HEARTS)),
+        (Card(Rank.TEN, Suit.CLUBS), Card(Rank.ACE, Suit.SPADES)),
+    )
+    return PlayTricksState(hands=hands, players=players, player_index=0)
+
+
 def test_play_card_removes_card_from_hand(start_of_play: PlayTricksState) -> None:
     player_suit = _get_player_suit(start_of_play)
     play_state = start_of_play.play_card(player=start_of_play.current_player(), card=Card(Rank.ACE, player_suit))
@@ -82,8 +93,22 @@ def _get_next_player(player: str) -> str:
     return {"a": "b", "b": "c", "c": "d", "d": "a"}[player]
 
 
+def test_played_card_matches_suit_if_possible(middle_of_play: PlayTricksState) -> None:
+    play_state = middle_of_play.play_card(player="a", card=Card(Rank.JACK, Suit.CLUBS))
+
+    # No exceptions thrown
+    play_state = play_state.play_card(player="b", card=Card(Rank.QUEEN, Suit.CLUBS))
+    play_state = play_state.play_card(player="c", card=Card(Rank.KING, Suit.CLUBS))
+    play_state.play_card(player="d", card=Card(Rank.TEN, Suit.CLUBS))
+
+
+def test_played_card_throws_exception_if_suit_not_matched(middle_of_play: PlayTricksState):
+    play_state = middle_of_play.play_card(player="a", card=Card(Rank.JACK, Suit.CLUBS))
+    with pytest.raises(InvalidPlay):
+        play_state.play_card(player="b", card=Card(Rank.ACE, Suit.DIAMONDS))
+
+
 # TODO
-#  - Progress play to next player
 #  - Check that the played card is valid
 #    + Matches suit if possible
 #    + Trump if not possible to match suit
