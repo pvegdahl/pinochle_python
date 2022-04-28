@@ -42,19 +42,20 @@ class PlayTricksState(NamedTuple):
         if self._is_beginning_of_trick():
             return
 
-        self._validate_match_suit_if_possible(card)
+        self._validate_plays_appropriate_suit(card)
         self._validate_card_wins_if_possible(card)
 
     def _is_beginning_of_trick(self):
         return len(self.current_trick) == 0
 
-    def _validate_match_suit_if_possible(self, card: Card) -> None:
-        suit_matches = card.suit == self.current_trick[0].suit
-        if self._has_suit_in_hand() and not suit_matches:
+    def _validate_plays_appropriate_suit(self, card: Card):
+        if self._has_suit_in_hand(self._suit_of_current_trick()) and card.suit != self._suit_of_current_trick():
             raise InvalidPlay("Must play on suit if possible")
+        elif self._has_suit_in_hand(self.trump) and card.suit != self.trump:
+            raise InvalidPlay("Must play trump when you cannot match suit")
 
-    def _has_suit_in_hand(self) -> bool:
-        return self._suit_of_current_trick() in (card.suit for card in self._current_player_hand())
+    def _has_suit_in_hand(self, suit: Suit) -> bool:
+        return suit in (card.suit for card in self._current_player_hand())
 
     def _suit_of_current_trick(self) -> Suit:
         return self.current_trick[0].suit

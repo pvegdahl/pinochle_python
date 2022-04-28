@@ -145,14 +145,30 @@ def test_must_win_with_trump_if_cannot_match_suit() -> None:
 
     with pytest.raises(InvalidPlay) as e:
         play_state.play_card(player="b", card=Card(Rank.NINE, Suit.SPADES))
-    assert e.value.args[0] == "Must beat current winning card if possible"
+    assert e.value.args[0] == "Must play trump when you cannot match suit"
 
+
+def test_must_play_trump_if_cannot_match_even_if_that_trump_loses() -> None:
+    hands = (
+        (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.NINE, Suit.SPADES), Card(Rank.ACE, Suit.HEARTS)),
+        (Card(Rank.NINE, Suit.SPADES), Card(Rank.JACK, Suit.HEARTS)),
+    )
+
+    play_state = PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.HEARTS).play_card(
+        "a", Card(Rank.ACE, Suit.CLUBS)
+    ).play_card("b", Card(Rank.ACE, Suit.HEARTS))
+
+    # No exception
+    play_state.play_card(player="c", card=Card(Rank.JACK, Suit.HEARTS))
+
+    with pytest.raises(InvalidPlay) as e:
+        play_state.play_card(player="c", card=Card(Rank.NINE, Suit.SPADES))
+    assert e.value.args[0] == "Must play trump when you cannot match suit"
 
 # TODO
 #  - Check that the played card is valid
-#    + Trump if not possible to match suit
-#    + Higher than current winner if possible
-#    + If can't match suit, but can't beat trump, must still play a trump
+#    + Cannot play trump if can match suit
 #  - When a trick is over:
 #    + Who won the trick?
 #    + In the event of a tie, the first player playing that card is the winner
