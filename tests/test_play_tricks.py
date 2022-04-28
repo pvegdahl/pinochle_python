@@ -75,7 +75,7 @@ def test_cannot_play_out_of_turn(player: str, card: Card, start_of_play_a: PlayT
 def test_cannot_play_card_not_in_hand(start_of_play_a: PlayTricksState) -> None:
     with pytest.raises(InvalidPlay) as e:
         start_of_play_a.play_card(player="a", card=Card(Rank.JACK, Suit.DIAMONDS))
-    assert e.value.args[0] == "a does not have a Jack of Diamonds in hand"
+    assert e.value.args[0] == "Invalid card played"
 
 
 def test_play_progresses_to_next_player(start_of_play: PlayTricksState) -> None:
@@ -111,7 +111,7 @@ def test_played_card_throws_exception_if_suit_not_matched(middle_of_play: PlayTr
 
     with pytest.raises(InvalidPlay) as e:
         play_state.play_card(player="b", card=Card(Rank.ACE, Suit.DIAMONDS))
-    assert e.value.args[0] == "Must play on suit if possible"
+    assert e.value.args[0] == "Invalid card played"
 
 
 def test_played_card_must_beat_trick_if_possible() -> None:
@@ -128,7 +128,7 @@ def test_played_card_must_beat_trick_if_possible() -> None:
 
     with pytest.raises(InvalidPlay) as e:
         play_state.play_card(player="b", card=Card(Rank.NINE, Suit.CLUBS))
-    assert e.value.args[0] == "Must beat current winning card if possible"
+    assert e.value.args[0] == "Invalid card played"
 
 
 def test_must_win_with_trump_if_cannot_match_suit() -> None:
@@ -145,7 +145,7 @@ def test_must_win_with_trump_if_cannot_match_suit() -> None:
 
     with pytest.raises(InvalidPlay) as e:
         play_state.play_card(player="b", card=Card(Rank.NINE, Suit.SPADES))
-    assert e.value.args[0] == "Must play trump when you cannot match suit"
+    assert e.value.args[0] == "Invalid card played"
 
 
 def test_must_play_trump_if_cannot_match_even_if_that_trump_loses() -> None:
@@ -164,11 +164,45 @@ def test_must_play_trump_if_cannot_match_even_if_that_trump_loses() -> None:
 
     with pytest.raises(InvalidPlay) as e:
         play_state.play_card(player="c", card=Card(Rank.NINE, Suit.SPADES))
-    assert e.value.args[0] == "Must play trump when you cannot match suit"
+    assert e.value.args[0] == "Invalid card played"
+
+
+def test_cannot_play_trump_if_matching_suit_available() -> None:
+    hands = (
+        (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.ACE, Suit.CLUBS), Card(Rank.NINE, Suit.HEARTS)),
+    )
+    play_state = PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.HEARTS).play_card(
+        "a", Card(Rank.ACE, Suit.CLUBS)
+    )
+
+    # No exception
+    play_state.play_card(player="b", card=Card(Rank.ACE, Suit.CLUBS))
+
+    with pytest.raises(InvalidPlay) as e:
+        play_state.play_card(player="b", card=Card(Rank.NINE, Suit.HEARTS))
+    assert e.value.args[0] == "Invalid card played"
+
+
+def test_must_play_winning_trump_if_possible() -> None:
+    hands = (
+        (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.NINE, Suit.SPADES), Card(Rank.KING, Suit.HEARTS)),
+        (Card(Rank.NINE, Suit.HEARTS), Card(Rank.ACE, Suit.HEARTS)),
+    )
+
+    play_state = PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.HEARTS).play_card(
+        "a", Card(Rank.ACE, Suit.CLUBS)
+    ).play_card("b", Card(Rank.KING, Suit.HEARTS))
+
+    # No exception
+    play_state.play_card(player="c", card=Card(Rank.ACE, Suit.HEARTS))
+
+    with pytest.raises(InvalidPlay) as e:
+        play_state.play_card(player="c", card=Card(Rank.NINE, Suit.HEARTS))
+    assert e.value.args[0] == "Invalid card played"
 
 # TODO
-#  - Check that the played card is valid
-#    + Cannot play trump if can match suit
 #  - When a trick is over:
 #    + Who won the trick?
 #    + In the event of a tie, the first player playing that card is the winner

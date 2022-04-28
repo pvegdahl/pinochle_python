@@ -1,4 +1,4 @@
-from typing import NamedTuple, Tuple
+from typing import NamedTuple, Tuple, Set
 
 from cards import Card, Suit
 from utils import remove_cards_from_hand, InvalidCardRemoval
@@ -39,33 +39,35 @@ class PlayTricksState(NamedTuple):
         return (self.player_index + 1) % 4
 
     def _validate_chosen_card(self, card: Card) -> None:
-        if self._is_beginning_of_trick():
-            return
+        if card not in self._get_valid_cards_to_play():
+            raise InvalidPlay("Invalid card played")
 
-        self._validate_plays_appropriate_suit(card)
-        self._validate_card_wins_if_possible(card)
+    def _get_valid_cards_to_play(self) -> Set[Card]:
+        if self._is_beginning_of_trick():
+            return set(self._current_player_hand())
+
+        # (1) filter to either the current suit or trump or just return everything
+        if self._has_suit_in_hand(self._suit_of_current_trick()):
+            matching_cards = set(card for card in self._current_player_hand() if card.suit == self._suit_of_current_trick())
+        elif self._has_suit_in_hand(self.trump):
+            matching_cards = set(card for card in self._current_player_hand() if card.suit == self.trump)
+        else:
+            return set(self._current_player_hand())
+
+        # (2) filter to only winning cards
+        winning_cards = set(filter(lambda card: card > self._current_winning_card(), matching_cards))
+
+        # (3) if there are no winning cards, then return all matching cards
+        return winning_cards if winning_cards else matching_cards
 
     def _is_beginning_of_trick(self):
         return len(self.current_trick) == 0
 
-    def _validate_plays_appropriate_suit(self, card: Card):
-        if self._has_suit_in_hand(self._suit_of_current_trick()) and card.suit != self._suit_of_current_trick():
-            raise InvalidPlay("Must play on suit if possible")
-        elif self._has_suit_in_hand(self.trump) and card.suit != self.trump:
-            raise InvalidPlay("Must play trump when you cannot match suit")
-
     def _has_suit_in_hand(self, suit: Suit) -> bool:
-        return suit in (card.suit for card in self._current_player_hand())
+        return suit in {card.suit for card in self._current_player_hand()}
 
     def _suit_of_current_trick(self) -> Suit:
         return self.current_trick[0].suit
-
-    def _validate_card_wins_if_possible(self, card: Card) -> None:
-        if not self._new_card_wins_current_trick(card) and self._possible_to_win():
-            raise InvalidPlay("Must beat current winning card if possible")
-
-    def _new_card_wins_current_trick(self, card: Card) -> bool:
-        return self._second_card_wins(self._current_winning_card(), card)
 
     def _current_winning_card(self) -> Card:
         result = self.current_trick[0]
@@ -79,6 +81,3 @@ class PlayTricksState(NamedTuple):
             return card1.rank > card0.rank
         else:
             return card1.suit == self.trump
-
-    def _possible_to_win(self) -> bool:
-        return any(self._new_card_wins_current_trick(card) for card in self._current_player_hand())
