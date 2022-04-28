@@ -152,6 +152,7 @@ def test_must_win_with_trump_if_cannot_match_suit() -> None:
 #  - Check that the played card is valid
 #    + Trump if not possible to match suit
 #    + Higher than current winner if possible
+#    + If can't match suit, but can't beat trump, must still play a trump
 #  - When a trick is over:
 #    + Who won the trick?
 #    + In the event of a tie, the first player playing that card is the winner

@@ -73,11 +73,11 @@ class PlayTricksState(NamedTuple):
                 result = card
         return result
 
-    @staticmethod
-    def _second_card_wins(card0: Card, card1: Card) -> bool:
+    def _second_card_wins(self, card0: Card, card1: Card) -> bool:
         if card0.suit == card1.suit:
             return card1.rank > card0.rank
-        return False
+        else:
+            return card1.suit == self.trump
 
     def _possible_to_win(self) -> bool:
         return any(self._new_card_wins_current_trick(card) for card in self._current_player_hand())
