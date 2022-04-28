@@ -20,7 +20,7 @@ def start_of_play(request, sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTr
 
 
 @pytest.fixture(scope="session")
-def middle_of_play(sorted_hands: Tuple[Tuple[Card, ...], ...]) -> PlayTricksState:
+def middle_of_play() -> PlayTricksState:
     hands = (
         (Card(Rank.JACK, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
         (Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.ACE, Suit.DIAMONDS)),
