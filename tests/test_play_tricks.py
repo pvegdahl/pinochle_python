@@ -236,66 +236,73 @@ def test_can_play_lower_in_suit_card_if_only_able_to_match():
     play_state.play_card(player="b", card=Card(Rank.QUEEN, Suit.CLUBS))
 
 
-# @pytest.mark.parametrize(
-#     "trick, final_player_index, expected",
-#     [
-#         (
-#             (
-#                 Card(Rank.ACE, Suit.CLUBS),
-#                 Card(Rank.TEN, Suit.CLUBS),
-#                 Card(Rank.KING, Suit.CLUBS),
-#                 Card(Rank.QUEEN, Suit.CLUBS),
-#             ),
-#             3,
-#             0,
-#         ),
-#         (
-#             (
-#                 Card(Rank.TEN, Suit.CLUBS),
-#                 Card(Rank.KING, Suit.CLUBS),
-#                 Card(Rank.ACE, Suit.CLUBS),
-#                 Card(Rank.QUEEN, Suit.CLUBS),
-#             ),
-#             3,
-#             2,
-#         ),
-#         (
-#             (
-#                 Card(Rank.TEN, Suit.CLUBS),
-#                 Card(Rank.KING, Suit.CLUBS),
-#                 Card(Rank.ACE, Suit.CLUBS),
-#                 Card(Rank.QUEEN, Suit.CLUBS),
-#             ),
-#             2,
-#             1,
-#         ),
-#         (
-#             (
-#                 Card(Rank.TEN, Suit.DIAMONDS),
-#                 Card(Rank.KING, Suit.DIAMONDS),
-#                 Card(Rank.JACK, Suit.DIAMONDS),
-#                 Card(Rank.QUEEN, Suit.DIAMONDS),
-#             ),
-#             2,
-#             1,
-#         ),
-#     ],
-# )
-# def test_index_of_trick_winner(trick, final_player_index, expected) -> None:
-#     first_3_cards = trick[:3]
-#     last_card = trick[3]
-#     hands = ((),) * final_player_index + ((last_card,),) + ((),) * (3 - final_player_index)
-#     play_state = PlayTricksState(
-#         player_index=final_player_index, current_trick=first_3_cards, players=PLAYERS, trump=Suit.CLUBS, hands=hands
-#     )
-#     assert play_state.play_card(PLAYERS[final_player_index], last_card).player_index == expected
+@pytest.mark.parametrize(
+    "trick, final_player_index, expected",
+    [
+        (
+            (
+                Card(Rank.ACE, Suit.CLUBS),
+                Card(Rank.TEN, Suit.CLUBS),
+                Card(Rank.KING, Suit.CLUBS),
+                Card(Rank.QUEEN, Suit.CLUBS),
+            ),
+            3,
+            0,
+        ),
+        (
+            (
+                Card(Rank.TEN, Suit.CLUBS),
+                Card(Rank.KING, Suit.CLUBS),
+                Card(Rank.ACE, Suit.CLUBS),
+                Card(Rank.QUEEN, Suit.CLUBS),
+            ),
+            3,
+            2,
+        ),
+        (
+            (
+                Card(Rank.TEN, Suit.CLUBS),
+                Card(Rank.KING, Suit.CLUBS),
+                Card(Rank.ACE, Suit.CLUBS),
+                Card(Rank.QUEEN, Suit.CLUBS),
+            ),
+            2,
+            1,
+        ),
+        (
+            (
+                Card(Rank.TEN, Suit.DIAMONDS),
+                Card(Rank.KING, Suit.CLUBS),
+                Card(Rank.JACK, Suit.DIAMONDS),
+                Card(Rank.QUEEN, Suit.DIAMONDS),
+            ),
+            2,
+            0,
+        ),
+        (
+                (
+                        Card(Rank.NINE, Suit.DIAMONDS),
+                        Card(Rank.ACE, Suit.DIAMONDS),
+                        Card(Rank.JACK, Suit.DIAMONDS),
+                        Card(Rank.ACE, Suit.DIAMONDS),
+                ),
+                1,
+                3,
+        ),
+    ],
+)
+def test_index_of_trick_winner(trick, final_player_index, expected) -> None:
+    first_3_cards = trick[:3]
+    last_card = trick[3]
+    hands = (trick,) * 4  # A hack to ensure that the player has the card available for all permutations
+    play_state = PlayTricksState(
+        player_index=final_player_index, current_trick=first_3_cards, players=PLAYERS, trump=Suit.CLUBS, hands=hands
+    )
+    assert play_state.play_card(PLAYERS[final_player_index], last_card).player_index == expected
 
 
 # TODO
 #  - When a trick is over:
-#    + Who won the trick?
-#    + In the event of a tie, the first player playing that card is the winner
 #    + Credit the trick points correctly
 #    + (Including point for last trick)
-#    + Select the appropriate next player
 #    + Reset trick

@@ -26,14 +26,16 @@ class PlayTricksState(NamedTuple):
         except InvalidCardRemoval as e:
             raise InvalidPlay(f"{player} does not have a {card} in hand") from e
 
-        winner = self._get_trick_winner(card)
-        if winner is not None:
-
+        winner_index = self._get_trick_winner_index(card)
+        if winner_index is None:
+            new_player_index = self._incremented_player_index()
             pass
+        else:
+            new_player_index = winner_index
 
         return self._replace(
             hands=new_hands,
-            player_index=self._incremented_player_index(card),
+            player_index=new_player_index,
             current_trick=(self.current_trick + (card,)),
         )
 
@@ -43,7 +45,7 @@ class PlayTricksState(NamedTuple):
     def _current_player_hand(self) -> Tuple[Card, ...]:
         return self.hands[self.player_index]
 
-    def _incremented_player_index(self, card) -> int:
+    def _incremented_player_index(self) -> int:
         return (self.player_index + 1) % 4
 
     def _validate_chosen_card(self, card: Card) -> None:
@@ -91,11 +93,12 @@ class PlayTricksState(NamedTuple):
         else:
             return card1.suit == self.trump
 
-    def _index_of_trick_winner(self, trick: Tuple[Card, ...]) -> int:
-        return get_trick_winner_index(cards=trick, trump=self.trump) + self.player_index % 4
-
-    def _get_trick_winner(self, card: Card) -> Optional[int]:
+    def _get_trick_winner_index(self, card: Card) -> Optional[int]:
         if len(self.current_trick) < 3:
             return None
         else:
             return self._index_of_trick_winner(self.current_trick + (card,))
+
+    def _index_of_trick_winner(self, trick: Tuple[Card, ...]) -> int:
+        return (get_trick_winner_index(cards=trick, trump=self.trump) + self.player_index + 1) % 4
+
