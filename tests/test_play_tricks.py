@@ -280,14 +280,14 @@ def test_can_play_lower_in_suit_card_if_only_able_to_match():
             0,
         ),
         (
-                (
-                        Card(Rank.NINE, Suit.DIAMONDS),
-                        Card(Rank.ACE, Suit.DIAMONDS),
-                        Card(Rank.JACK, Suit.DIAMONDS),
-                        Card(Rank.ACE, Suit.DIAMONDS),
-                ),
-                1,
-                3,
+            (
+                Card(Rank.NINE, Suit.DIAMONDS),
+                Card(Rank.ACE, Suit.DIAMONDS),
+                Card(Rank.JACK, Suit.DIAMONDS),
+                Card(Rank.ACE, Suit.DIAMONDS),
+            ),
+            1,
+            3,
         ),
     ],
 )
@@ -303,6 +303,6 @@ def test_index_of_trick_winner(trick, final_player_index, expected) -> None:
 
 # TODO
 #  - When a trick is over:
-#    + Credit the trick points correctly
-#    + (Including point for last trick)
+#    + Assign trick cards to appropriate player
+#    + Credit the point for last trick if applicable
 #    + Reset trick

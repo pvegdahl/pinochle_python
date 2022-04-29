@@ -45,20 +45,26 @@ def test_get_trick_winner_index(cards, expected_index):
     assert get_trick_winner_index(cards=cards, trump=Suit.CLUBS) == expected_index
 
 
-@pytest.mark.parametrize("card0, card1, trump", [
-    (Card(Rank.NINE, Suit.HEARTS), Card(Rank.JACK, Suit.HEARTS), Suit.CLUBS),
-    (Card(Rank.ACE, Suit.HEARTS), Card(Rank.JACK, Suit.CLUBS), Suit.CLUBS),
-    (Card(Rank.NINE, Suit.HEARTS), Card(Rank.JACK, Suit.HEARTS), Suit.HEARTS),
-])
+@pytest.mark.parametrize(
+    "card0, card1, trump",
+    [
+        (Card(Rank.NINE, Suit.HEARTS), Card(Rank.JACK, Suit.HEARTS), Suit.CLUBS),
+        (Card(Rank.ACE, Suit.HEARTS), Card(Rank.JACK, Suit.CLUBS), Suit.CLUBS),
+        (Card(Rank.NINE, Suit.HEARTS), Card(Rank.JACK, Suit.HEARTS), Suit.HEARTS),
+    ],
+)
 def test_second_card_wins_true(card0, card1, trump):
     assert second_card_wins(card0, card1, trump)
 
 
-@pytest.mark.parametrize("card0, card1, trump", [
-    (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.JACK, Suit.HEARTS), Suit.CLUBS),
-    (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.QUEEN, Suit.HEARTS), Suit.CLUBS),
-    (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.QUEEN, Suit.HEARTS), Suit.HEARTS),
-    (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.ACE, Suit.SPADES), Suit.CLUBS),
-])
+@pytest.mark.parametrize(
+    "card0, card1, trump",
+    [
+        (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.JACK, Suit.HEARTS), Suit.CLUBS),
+        (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.QUEEN, Suit.HEARTS), Suit.CLUBS),
+        (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.QUEEN, Suit.HEARTS), Suit.HEARTS),
+        (Card(Rank.QUEEN, Suit.HEARTS), Card(Rank.ACE, Suit.SPADES), Suit.CLUBS),
+    ],
+)
 def test_second_card_wins_false(card0, card1, trump):
     assert not second_card_wins(card0, card1, trump)

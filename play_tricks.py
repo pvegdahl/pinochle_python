@@ -67,7 +67,9 @@ class PlayTricksState(NamedTuple):
             return set(self._current_player_hand())
 
         # (2) filter to only winning cards
-        winning_cards = set(filter(lambda card: second_card_wins(self._winning_card(), card, trump=self.trump), matching_cards))
+        winning_cards = set(
+            filter(lambda card: second_card_wins(self._winning_card(), card, trump=self.trump), matching_cards)
+        )
 
         # (3) if there are no winning cards, then return all matching cards
         return winning_cards if winning_cards else matching_cards
@@ -101,4 +103,3 @@ class PlayTricksState(NamedTuple):
 
     def _index_of_trick_winner(self, trick: Tuple[Card, ...]) -> int:
         return (get_trick_winner_index(cards=trick, trump=self.trump) + self.player_index + 1) % 4
-
