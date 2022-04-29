@@ -209,18 +209,18 @@ def test_must_play_winning_trump_if_possible() -> None:
 
 def test_can_play_lower_in_suit_card_if_trump_is_winning():
     hands = (
-        (Card(Rank.KING, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
-        (Card(Rank.NINE, Suit.SPADES), Card(Rank.NINE, Suit.HEARTS)),
-        (Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.TEN, Suit.CLUBS)),
+        (Card(Rank.KING, Suit.SPADES), Card(Rank.ACE, Suit.SPADES)),
+        (Card(Rank.NINE, Suit.DIAMONDS), Card(Rank.KING, Suit.HEARTS)),
+        (Card(Rank.QUEEN, Suit.SPADES), Card(Rank.TEN, Suit.SPADES)),
     )
     play_state = (
         PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.HEARTS)
-        .play_card("a", Card(Rank.KING, Suit.CLUBS))
-        .play_card("b", Card(Rank.NINE, Suit.HEARTS))
+        .play_card("a", Card(Rank.KING, Suit.SPADES))
+        .play_card("b", Card(Rank.KING, Suit.HEARTS))
     )
 
     # No exception
-    play_state.play_card(player="c", card=Card(Rank.QUEEN, Suit.CLUBS))
+    play_state.play_card(player="c", card=Card(Rank.QUEEN, Suit.SPADES))
 
 
 def test_can_play_lower_in_suit_card_if_only_able_to_match():
@@ -236,59 +236,59 @@ def test_can_play_lower_in_suit_card_if_only_able_to_match():
     play_state.play_card(player="b", card=Card(Rank.QUEEN, Suit.CLUBS))
 
 
-@pytest.mark.parametrize(
-    "trick, final_player_index, expected",
-    [
-        (
-            (
-                Card(Rank.ACE, Suit.CLUBS),
-                Card(Rank.TEN, Suit.CLUBS),
-                Card(Rank.KING, Suit.CLUBS),
-                Card(Rank.QUEEN, Suit.CLUBS),
-            ),
-            3,
-            0,
-        ),
-        (
-            (
-                Card(Rank.TEN, Suit.CLUBS),
-                Card(Rank.KING, Suit.CLUBS),
-                Card(Rank.ACE, Suit.CLUBS),
-                Card(Rank.QUEEN, Suit.CLUBS),
-            ),
-            3,
-            2,
-        ),
-        (
-            (
-                Card(Rank.TEN, Suit.CLUBS),
-                Card(Rank.KING, Suit.CLUBS),
-                Card(Rank.ACE, Suit.CLUBS),
-                Card(Rank.QUEEN, Suit.CLUBS),
-            ),
-            2,
-            1,
-        ),
-        (
-            (
-                Card(Rank.TEN, Suit.DIAMONDS),
-                Card(Rank.KING, Suit.DIAMONDS),
-                Card(Rank.JACK, Suit.DIAMONDS),
-                Card(Rank.QUEEN, Suit.DIAMONDS),
-            ),
-            2,
-            1,
-        ),
-    ],
-)
-def test_index_of_trick_winner(trick, final_player_index, expected) -> None:
-    first_3_cards = trick[:3]
-    last_card = trick[3]
-    hands = ((),) * final_player_index + ((last_card,),) + ((),) * (3 - final_player_index)
-    play_state = PlayTricksState(
-        player_index=final_player_index, current_trick=first_3_cards, players=PLAYERS, trump=Suit.CLUBS, hands=hands
-    )
-    assert play_state.play_card(PLAYERS[final_player_index], last_card).player_index == expected
+# @pytest.mark.parametrize(
+#     "trick, final_player_index, expected",
+#     [
+#         (
+#             (
+#                 Card(Rank.ACE, Suit.CLUBS),
+#                 Card(Rank.TEN, Suit.CLUBS),
+#                 Card(Rank.KING, Suit.CLUBS),
+#                 Card(Rank.QUEEN, Suit.CLUBS),
+#             ),
+#             3,
+#             0,
+#         ),
+#         (
+#             (
+#                 Card(Rank.TEN, Suit.CLUBS),
+#                 Card(Rank.KING, Suit.CLUBS),
+#                 Card(Rank.ACE, Suit.CLUBS),
+#                 Card(Rank.QUEEN, Suit.CLUBS),
+#             ),
+#             3,
+#             2,
+#         ),
+#         (
+#             (
+#                 Card(Rank.TEN, Suit.CLUBS),
+#                 Card(Rank.KING, Suit.CLUBS),
+#                 Card(Rank.ACE, Suit.CLUBS),
+#                 Card(Rank.QUEEN, Suit.CLUBS),
+#             ),
+#             2,
+#             1,
+#         ),
+#         (
+#             (
+#                 Card(Rank.TEN, Suit.DIAMONDS),
+#                 Card(Rank.KING, Suit.DIAMONDS),
+#                 Card(Rank.JACK, Suit.DIAMONDS),
+#                 Card(Rank.QUEEN, Suit.DIAMONDS),
+#             ),
+#             2,
+#             1,
+#         ),
+#     ],
+# )
+# def test_index_of_trick_winner(trick, final_player_index, expected) -> None:
+#     first_3_cards = trick[:3]
+#     last_card = trick[3]
+#     hands = ((),) * final_player_index + ((last_card,),) + ((),) * (3 - final_player_index)
+#     play_state = PlayTricksState(
+#         player_index=final_player_index, current_trick=first_3_cards, players=PLAYERS, trump=Suit.CLUBS, hands=hands
+#     )
+#     assert play_state.play_card(PLAYERS[final_player_index], last_card).player_index == expected
 
 
 # TODO
