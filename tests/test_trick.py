@@ -1,7 +1,7 @@
 import pytest
 
 from cards import Card, Rank, Suit
-from trick import Trick
+from trick import get_trick_winner
 
 
 @pytest.mark.parametrize("cards, expected", [
@@ -10,11 +10,10 @@ from trick import Trick
     ((Card(Rank.KING, Suit.DIAMONDS), Card(Rank.ACE, Suit.HEARTS)), Card(Rank.KING, Suit.DIAMONDS)),
 ])
 def test_highest_card_in_led_suit_wins(cards, expected):
-    assert Trick(cards=cards).get_winner() == expected
+    assert get_trick_winner(cards=cards) == expected
 
 
 # TODO
-# - Highest card wins when all same suit
 # - Trump beats non trump
 # - Higher trump wins
 # - Off suit not trump always loses
