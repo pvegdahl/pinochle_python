@@ -44,6 +44,11 @@ class Card:
     suit: Suit
 
     def __lt__(self, other: "Card") -> bool:
+        """
+        This sort function is used to sort cards in hand for players.  It is not intended to compare card values for
+        calculating play outcomes.  It will lead to weird results for that.  To do that properly, you need a function
+        that knows the trump suit.  See tricks.py:second_card_wins()
+        """
         if self.suit == other.suit:
             return self.rank < other.rank
         return self.suit < other.suit
