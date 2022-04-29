@@ -207,6 +207,33 @@ def test_must_play_winning_trump_if_possible() -> None:
     assert e.value.args[0] == "Invalid card played"
 
 
+def test_can_play_lower_in_suit_card_if_trump_is_winning():
+    hands = (
+        (Card(Rank.KING, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.NINE, Suit.SPADES), Card(Rank.NINE, Suit.HEARTS)),
+        (Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.TEN, Suit.CLUBS)),
+    )
+    play_state = PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.HEARTS).play_card(
+        "a", Card(Rank.KING, Suit.CLUBS)
+    ).play_card("b", Card(Rank.NINE, Suit.HEARTS))
+
+    # No exception
+    play_state.play_card(player="c", card=Card(Rank.QUEEN, Suit.CLUBS))
+
+
+def test_can_play_lower_in_suit_card_if_only_able_to_match():
+    hands = (
+        (Card(Rank.KING, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+        (Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)),
+    )
+    play_state = PlayTricksState(hands=hands, players=PLAYERS, player_index=0, trump=Suit.HEARTS).play_card(
+        "a", Card(Rank.ACE, Suit.CLUBS)
+    )
+
+    # No exception
+    play_state.play_card(player="b", card=Card(Rank.QUEEN, Suit.CLUBS))
+
+
 @pytest.mark.parametrize(
     "trick, final_player_index, expected",
     [

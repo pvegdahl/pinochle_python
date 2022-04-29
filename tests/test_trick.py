@@ -1,7 +1,7 @@
 import pytest
 
 from cards import Card, Rank, Suit
-from trick import get_trick_winner, get_trick_winner_index
+from trick import get_trick_winning_card, get_trick_winner_index
 
 
 @pytest.mark.parametrize("cards, expected_card", [
@@ -10,7 +10,7 @@ from trick import get_trick_winner, get_trick_winner_index
     ((Card(Rank.KING, Suit.DIAMONDS), Card(Rank.ACE, Suit.HEARTS)), Card(Rank.KING, Suit.DIAMONDS)),
 ])
 def test_highest_card_in_led_suit_wins(cards, expected_card):
-    assert get_trick_winner(cards=cards, trump=Suit.CLUBS) == expected_card
+    assert get_trick_winning_card(cards=cards, trump=Suit.CLUBS) == expected_card
 
 
 @pytest.mark.parametrize("cards, expected_card", [
@@ -18,7 +18,7 @@ def test_highest_card_in_led_suit_wins(cards, expected_card):
     ((Card(Rank.ACE, Suit.SPADES), Card(Rank.TEN, Suit.CLUBS), Card(Rank.ACE, Suit.CLUBS)), Card(Rank.ACE, Suit.CLUBS)),
 ])
 def test_trump_beats_non_trump(cards, expected_card):
-    assert get_trick_winner(cards=cards, trump=Suit.CLUBS) == expected_card
+    assert get_trick_winning_card(cards=cards, trump=Suit.CLUBS) == expected_card
 
 
 @pytest.mark.parametrize("cards, expected_index", [

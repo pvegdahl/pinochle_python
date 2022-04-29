@@ -1,7 +1,7 @@
-from functools import reduce
 from typing import NamedTuple, Tuple, Set, Optional
 
-from cards import Card, Suit, Rank
+from cards import Card, Suit
+from trick import get_trick_winning_card, get_trick_winner_index
 from utils import remove_cards_from_hand, InvalidCardRemoval
 
 
@@ -77,15 +77,11 @@ class PlayTricksState(NamedTuple):
     def _suit_of_current_trick(self) -> Suit:
         return self.current_trick[0].suit
 
-    def _winning_card(self, trick: Tuple[Card, ...] = None) -> Card:
-        if trick is None:
-            trick = self.current_trick
-        return reduce(lambda a, b: b if self._second_card_wins(a, b) else a, trick[1:], trick[0])
+    def _card_wins(self, card: Card) -> bool:
+        pass
 
-    def _winning_card_index(self, trick: Tuple[Card, ...] = None) -> int:
-        if trick is None:
-            trick = self.current_trick
-        return trick.index(self._winning_card())
+    def _winning_card(self) -> Card:
+        return get_trick_winning_card(cards=self.current_trick, trump=self.trump)
 
     def _second_card_wins(self, card0: Card, card1: Card) -> bool:
         if card0.suit == card1.suit:
@@ -94,7 +90,7 @@ class PlayTricksState(NamedTuple):
             return card1.suit == self.trump
 
     def _index_of_trick_winner(self, trick: Tuple[Card, ...]) -> int:
-        return self._winning_card_index(trick) + self.player_index % 4
+        return get_trick_winner_index(cards=trick, trump=self.trump) + self.player_index % 4
 
     def _get_trick_winner(self, card: Card) -> Optional[int]:
         if len(self.current_trick) < 3:
