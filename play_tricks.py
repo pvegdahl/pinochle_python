@@ -32,7 +32,9 @@ class PlayTricksState(NamedTuple):
             pass
 
         return self._replace(
-            hands=new_hands, player_index=self._incremented_player_index(card), current_trick=(self.current_trick + (card,))
+            hands=new_hands,
+            player_index=self._incremented_player_index(card),
+            current_trick=(self.current_trick + (card,)),
         )
 
     def current_player(self) -> str:
