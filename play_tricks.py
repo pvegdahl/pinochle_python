@@ -1,6 +1,7 @@
-from typing import NamedTuple, Tuple, Set
+from functools import reduce
+from typing import NamedTuple, Tuple, Set, Optional
 
-from cards import Card, Suit
+from cards import Card, Suit, Rank
 from utils import remove_cards_from_hand, InvalidCardRemoval
 
 
@@ -25,8 +26,13 @@ class PlayTricksState(NamedTuple):
         except InvalidCardRemoval as e:
             raise InvalidPlay(f"{player} does not have a {card} in hand") from e
 
+        winner = self._get_trick_winner(card)
+        if winner is not None:
+
+            pass
+
         return self._replace(
-            hands=new_hands, player_index=self._incremented_player_index(), current_trick=(self.current_trick + (card,))
+            hands=new_hands, player_index=self._incremented_player_index(card), current_trick=(self.current_trick + (card,))
         )
 
     def current_player(self) -> str:
@@ -35,7 +41,7 @@ class PlayTricksState(NamedTuple):
     def _current_player_hand(self) -> Tuple[Card, ...]:
         return self.hands[self.player_index]
 
-    def _incremented_player_index(self) -> int:
+    def _incremented_player_index(self, card) -> int:
         return (self.player_index + 1) % 4
 
     def _validate_chosen_card(self, card: Card) -> None:
@@ -48,14 +54,16 @@ class PlayTricksState(NamedTuple):
 
         # (1) filter to either the current suit or trump or just return everything
         if self._has_suit_in_hand(self._suit_of_current_trick()):
-            matching_cards = set(card for card in self._current_player_hand() if card.suit == self._suit_of_current_trick())
+            matching_cards = set(
+                card for card in self._current_player_hand() if card.suit == self._suit_of_current_trick()
+            )
         elif self._has_suit_in_hand(self.trump):
             matching_cards = set(card for card in self._current_player_hand() if card.suit == self.trump)
         else:
             return set(self._current_player_hand())
 
         # (2) filter to only winning cards
-        winning_cards = set(filter(lambda card: card > self._current_winning_card(), matching_cards))
+        winning_cards = set(filter(lambda card: card > self._winning_card(), matching_cards))
 
         # (3) if there are no winning cards, then return all matching cards
         return winning_cards if winning_cards else matching_cards
@@ -69,15 +77,27 @@ class PlayTricksState(NamedTuple):
     def _suit_of_current_trick(self) -> Suit:
         return self.current_trick[0].suit
 
-    def _current_winning_card(self) -> Card:
-        result = self.current_trick[0]
-        for card in self.current_trick[1:]:
-            if self._second_card_wins(result, card):
-                result = card
-        return result
+    def _winning_card(self, trick: Tuple[Card, ...] = None) -> Card:
+        if trick is None:
+            trick = self.current_trick
+        return reduce(lambda a, b: b if self._second_card_wins(a, b) else a, trick[1:], trick[0])
+
+    def _winning_card_index(self, trick: Tuple[Card, ...] = None) -> int:
+        if trick is None:
+            trick = self.current_trick
+        return trick.index(self._winning_card())
 
     def _second_card_wins(self, card0: Card, card1: Card) -> bool:
         if card0.suit == card1.suit:
             return card1.rank > card0.rank
         else:
             return card1.suit == self.trump
+
+    def _index_of_trick_winner(self, trick: Tuple[Card, ...]) -> int:
+        return self._winning_card_index(trick) + self.player_index % 4
+
+    def _get_trick_winner(self, card: Card) -> Optional[int]:
+        if len(self.current_trick) < 3:
+            return None
+        else:
+            return self._index_of_trick_winner(self.current_trick + (card,))
