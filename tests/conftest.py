@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pytest
 
-from cards import Card, Suit, Rank
+from pinochle.cards import Card, Suit, Rank
 
 
 @pytest.fixture(scope="session")

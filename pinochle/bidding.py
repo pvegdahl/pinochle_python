@@ -1,6 +1,6 @@
 from typing import NamedTuple, Tuple, Optional
 
-from cards import Suit
+from pinochle.cards import Suit
 
 
 class InvalidBid(Exception):

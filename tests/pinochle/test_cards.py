@@ -1,6 +1,6 @@
 import pytest
 
-from cards import Rank, CardDeck, Suit, Card
+from pinochle.cards import Rank, CardDeck, Suit, Card
 
 
 @pytest.mark.parametrize(

@@ -2,8 +2,8 @@ from typing import NamedTuple, List
 
 import pytest
 
-from cards import Suit, Card, Rank
-from scoring import score_meld
+from pinochle.cards import Suit, Card, Rank
+from pinochle.scoring import score_meld
 
 
 class TestScoreMeld:

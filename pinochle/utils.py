@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from cards import Card
+from pinochle.cards import Card
 
 
 class InvalidCardRemoval(Exception):

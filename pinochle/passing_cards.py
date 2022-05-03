@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import NamedTuple, Tuple
 
-from cards import Card
-from utils import remove_cards_from_hand
+from pinochle.cards import Card
+from pinochle.utils import remove_cards_from_hand
 
 
 class IllegalPass(Exception):

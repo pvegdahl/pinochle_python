@@ -1,9 +1,9 @@
-from typing import Tuple, NamedTuple
+from typing import Tuple
 
 import pytest
 
-from cards import Card, Suit, Rank
-from play_tricks import PlayTricksState, InvalidPlay
+from pinochle.cards import Card, Suit, Rank
+from pinochle.play_tricks import PlayTricksState, InvalidPlay
 
 
 PLAYERS = ("a", "b", "c", "d")

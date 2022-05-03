@@ -2,9 +2,9 @@ from typing import Tuple
 
 import pytest
 
-from cards import Card, Suit, Rank
-from passing_cards import PassingCards, IllegalPass
-from utils import InvalidCardRemoval
+from pinochle.cards import Card, Suit, Rank
+from pinochle.passing_cards import PassingCards, IllegalPass
+from pinochle.utils import InvalidCardRemoval
 
 
 def bid_winner() -> str:

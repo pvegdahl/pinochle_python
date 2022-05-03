@@ -1,8 +1,8 @@
 from typing import NamedTuple, Tuple, Set, Optional
 
-from cards import Card, Suit
-from trick import get_trick_winning_card, get_trick_winner_index, second_card_wins
-from utils import remove_cards_from_hand, InvalidCardRemoval
+from pinochle.cards import Card, Suit
+from pinochle.trick import get_trick_winning_card, get_trick_winner_index, second_card_wins
+from pinochle.utils import remove_cards_from_hand, InvalidCardRemoval
 
 
 class InvalidPlay(Exception):

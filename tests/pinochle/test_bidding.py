@@ -2,8 +2,8 @@ from typing import Tuple
 
 import pytest
 
-from bidding import BiddingState, InvalidBid
-from cards import Suit
+from pinochle.bidding import BiddingState, InvalidBid
+from pinochle.cards import Suit
 
 
 @pytest.fixture(scope="session")

@@ -1,7 +1,7 @@
 import pytest
 
-from cards import Card, Rank, Suit
-from trick import get_trick_winning_card, get_trick_winner_index, second_card_wins
+from pinochle.cards import Card, Rank, Suit
+from pinochle.trick import get_trick_winning_card, get_trick_winner_index, second_card_wins
 
 
 @pytest.mark.parametrize(

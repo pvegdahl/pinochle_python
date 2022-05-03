@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import NamedTuple, Tuple, Optional
 
-from bidding import BiddingState
-from cards import Card, CardDeck, Suit
+from pinochle.bidding import BiddingState
+from pinochle.cards import Card, CardDeck, Suit
 
 
 class GameState(Enum):

@@ -1,7 +1,7 @@
 from functools import reduce
 from typing import Tuple
 
-from cards import Card, Suit
+from pinochle.cards import Card, Suit
 
 
 def get_trick_winning_card(cards: Tuple[Card, ...], trump: Suit) -> Card:

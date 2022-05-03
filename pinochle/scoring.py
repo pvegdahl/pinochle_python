@@ -1,6 +1,6 @@
 from typing import List, NamedTuple
 
-from cards import Card, Suit, Rank
+from pinochle.cards import Card, Suit, Rank
 
 
 class Meld(NamedTuple):

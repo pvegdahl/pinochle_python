@@ -2,9 +2,9 @@ from typing import Tuple
 
 import pytest
 
-from bidding import BiddingState
-from cards import CardDeck, Suit, Card, Rank
-from pinochle_game import PinochleGame, GameState, IllegalPass
+from pinochle.bidding import BiddingState
+from pinochle.cards import CardDeck, Suit, Card, Rank
+from pinochle.pinochle_game import PinochleGame, GameState
 
 
 @pytest.fixture(scope="session")
